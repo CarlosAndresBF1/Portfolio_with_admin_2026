@@ -1,0 +1,23 @@
+{
+  "name": "portfolio-monorepo",
+  "private": true,
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=9"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel --filter portfolio --filter admin run dev",
+    "dev:portfolio": "pnpm --filter portfolio run dev",
+    "dev:admin": "pnpm --filter admin run dev",
+    "build": "pnpm --filter portfolio run build && pnpm --filter admin run build",
+    "build:portfolio": "pnpm --filter portfolio run build",
+    "build:admin": "pnpm --filter admin run build",
+    "test": "pnpm --filter portfolio run test",
+    "db:generate": "pnpm --filter admin run prisma:generate",
+    "db:migrate": "pnpm --filter admin run prisma:migrate",
+    "db:migrate:deploy": "pnpm --filter admin run prisma:migrate:deploy",
+    "db:seed": "pnpm --filter admin run prisma:seed",
+    "db:studio": "pnpm --filter admin run prisma:studio",
+    "db:reset": "pnpm --filter admin run prisma:reset"
+  }
+}

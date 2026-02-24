@@ -1,0 +1,13 @@
+# Development overrides: docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+# Only starts postgres — run admin & portfolio locally with pnpm dev
+
+services:
+  postgres:
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+
+  # Disable admin & portfolio in dev (run locally with hot reload)
+  admin:
+    profiles: ["docker-only"]
+  portfolio:
+    profiles: ["docker-only"]

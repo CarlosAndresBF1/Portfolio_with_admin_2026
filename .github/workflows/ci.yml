@@ -1,0 +1,105 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-and-test:
+    name: Lint & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint admin
+        run: pnpm --filter admin run lint
+
+      - name: Test portfolio
+        run: pnpm --filter portfolio run test
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: lint-and-test
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: portfolio_db
+          POSTGRES_USER: portfolio_user
+          POSTGRES_PASSWORD: ci_test_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U portfolio_user -d portfolio_db"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma Client
+        run: pnpm db:generate
+        env:
+          DATABASE_URL: postgresql://portfolio_user:ci_test_password@localhost:5432/portfolio_db
+
+      - name: Run Prisma migrations
+        run: pnpm db:migrate:deploy
+        env:
+          DATABASE_URL: postgresql://portfolio_user:ci_test_password@localhost:5432/portfolio_db
+
+      - name: Build admin
+        run: pnpm build:admin
+        env:
+          DATABASE_URL: postgresql://portfolio_user:ci_test_password@localhost:5432/portfolio_db
+          NEXTAUTH_SECRET: ci-test-secret-not-for-production
+          NEXTAUTH_URL: http://localhost:3000
+          INTERNAL_API_KEY: ci-test-key
+          PORTFOLIO_URL: http://localhost:4321
+
+      - name: Build portfolio
+        run: pnpm build:portfolio
+
+  docker:
+    name: Docker Build
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build admin image
+        run: docker build -t portfolio-admin ./packages/admin
+
+      - name: Build portfolio image
+        run: docker build -t portfolio-site ./packages/portfolio

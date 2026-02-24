@@ -1,0 +1,326 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Languages ────────────────────────────────────────────────────────────────
+
+model Language {
+  id   String @id @default(uuid())
+  code String @unique // "en" | "es"
+  name String // "English" | "Español"
+
+  personalInfos              PersonalInfo[]
+  metaSeos                   MetaSeo[]
+  navLabels                  NavLabel[]
+  aboutSections              AboutSection[]
+  summaryCards               SummaryCard[]
+  experienceTranslations     ExperienceTranslation[]
+  skillCategoryTranslations  SkillCategoryTranslation[]
+  skillTranslations          SkillTranslation[]
+  marqueeItems               MarqueeItem[]
+  projectTranslations        ProjectTranslation[]
+  contactSectionTranslations ContactSectionTranslation[]
+  footerTranslations         FooterTranslation[]
+}
+
+// ─── Hero / Personal Info ─────────────────────────────────────────────────────
+
+model PersonalInfo {
+  id         String   @id @default(uuid())
+  languageId String   @unique
+  language   Language @relation(fields: [languageId], references: [id])
+  name       String
+  lastName   String
+  role       String
+  tagline    String
+  switchLang String // texto del botón "ES" | "EN"
+  updatedAt  DateTime @updatedAt
+}
+
+// ─── SEO Meta ─────────────────────────────────────────────────────────────────
+
+model MetaSeo {
+  id          String   @id @default(uuid())
+  languageId  String   @unique
+  language    Language @relation(fields: [languageId], references: [id])
+  title       String
+  description String
+  updatedAt   DateTime @updatedAt
+}
+
+// ─── Navbar Labels ────────────────────────────────────────────────────────────
+
+model NavLabel {
+  id         String   @id @default(uuid())
+  languageId String   @unique
+  language   Language @relation(fields: [languageId], references: [id])
+  home       String
+  about      String
+  experience String
+  skills     String
+  projects   String
+  contact    String
+  updatedAt  DateTime @updatedAt
+}
+
+// ─── About Section ────────────────────────────────────────────────────────────
+
+model AboutSection {
+  id          String            @id @default(uuid())
+  languageId  String            @unique
+  language    Language          @relation(fields: [languageId], references: [id])
+  title       String
+  subtitle    String
+  description String
+  location    String
+  email       String
+  phone       String
+  circleItems AboutCircleItem[]
+  updatedAt   DateTime          @updatedAt
+}
+
+model AboutCircleItem {
+  id             String       @id @default(uuid())
+  aboutSectionId String
+  aboutSection   AboutSection @relation(fields: [aboutSectionId], references: [id], onDelete: Cascade)
+  label          String
+  order          Int
+}
+
+// ─── Summary Cards ────────────────────────────────────────────────────────────
+
+model SummaryCard {
+  id         String   @id @default(uuid())
+  languageId String
+  language   Language @relation(fields: [languageId], references: [id])
+  order      Int
+  title      String
+  heading    String
+  text       String
+  updatedAt  DateTime @updatedAt
+}
+
+// ─── Experience ───────────────────────────────────────────────────────────────
+
+model ExperienceJob {
+  id           String                  @id @default(uuid())
+  number       String // "01", "02", etc.
+  company      String
+  periodStart  String // texto libre: "Ago 2023"
+  periodEnd    String // "Presente" o fecha
+  order        Int
+  translations ExperienceTranslation[]
+  stack        ExperienceStack[]
+  createdAt    DateTime                @default(now())
+  updatedAt    DateTime                @updatedAt
+}
+
+model ExperienceTranslation {
+  id         String        @id @default(uuid())
+  jobId      String
+  job        ExperienceJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  languageId String
+  language   Language      @relation(fields: [languageId], references: [id])
+  role       String
+  summary    String
+  details    String
+
+  @@unique([jobId, languageId])
+}
+
+model ExperienceStack {
+  id    String        @id @default(uuid())
+  jobId String
+  job   ExperienceJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  tech  String
+  order Int           @default(0)
+}
+
+// ─── Skills ───────────────────────────────────────────────────────────────────
+
+model SkillCategory {
+  id           String                     @id @default(uuid())
+  order        Int
+  translations SkillCategoryTranslation[]
+  skills       Skill[]
+  createdAt    DateTime                   @default(now())
+}
+
+model SkillCategoryTranslation {
+  id         String        @id @default(uuid())
+  categoryId String
+  category   SkillCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  languageId String
+  language   Language      @relation(fields: [languageId], references: [id])
+  name       String
+
+  @@unique([categoryId, languageId])
+}
+
+model Skill {
+  id           String             @id @default(uuid())
+  categoryId   String
+  category     SkillCategory      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  order        Int
+  years        String // "5+", "3+", etc.
+  translations SkillTranslation[]
+  workplaces   SkillWorkplace[]
+  createdAt    DateTime           @default(now())
+}
+
+model SkillTranslation {
+  id          String   @id @default(uuid())
+  skillId     String
+  skill       Skill    @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  languageId  String
+  language    Language @relation(fields: [languageId], references: [id])
+  name        String
+  description String
+
+  @@unique([skillId, languageId])
+}
+
+model SkillWorkplace {
+  id        String @id @default(uuid())
+  skillId   String
+  skill     Skill  @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  workplace String
+  order     Int    @default(0)
+}
+
+// ─── Marquee (hero animation) ─────────────────────────────────────────────────
+
+model MarqueeItem {
+  id         String   @id @default(uuid())
+  languageId String
+  language   Language @relation(fields: [languageId], references: [id])
+  text       String
+  order      Int
+}
+
+// ─── Projects ─────────────────────────────────────────────────────────────────
+
+model Project {
+  id           String               @id @default(uuid())
+  order        Int
+  translations ProjectTranslation[]
+  stack        ProjectStack[]
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+}
+
+model ProjectTranslation {
+  id          String   @id @default(uuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  languageId  String
+  language    Language @relation(fields: [languageId], references: [id])
+  title       String
+  description String
+
+  @@unique([projectId, languageId])
+}
+
+model ProjectStack {
+  id        String  @id @default(uuid())
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tech      String
+  order     Int     @default(0)
+}
+
+// ─── Contact Section (textos UI del formulario) ───────────────────────────────
+
+model ContactSectionTranslation {
+  id             String   @id @default(uuid())
+  languageId     String   @unique
+  language       Language @relation(fields: [languageId], references: [id])
+  title          String
+  titleHighlight String
+  subtitle       String
+  formName       String
+  formEmail      String
+  formSubject    String
+  formMessage    String
+  formSend       String
+  formSending    String
+  formSuccess    String
+  formError      String
+  updatedAt      DateTime @updatedAt
+}
+
+// ─── Footer ───────────────────────────────────────────────────────────────────
+
+model FooterTranslation {
+  id         String   @id @default(uuid())
+  languageId String   @unique
+  language   Language @relation(fields: [languageId], references: [id])
+  name       String
+  email      String
+  updatedAt  DateTime @updatedAt
+}
+
+// ─── Contact Form Submissions ─────────────────────────────────────────────────
+
+model ContactSubmission {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  subject   String
+  message   String
+  ipAddress String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+// ─── Admin Users (NextAuth) ───────────────────────────────────────────────────
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  password      String? // hashed con bcrypt
+  accounts      Account[]
+  sessions      Session[]
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
