@@ -32,7 +32,7 @@ function getTransporter(): nodemailer.Transporter {
 }
 
 const getContactTo = () =>
-  process.env.CONTACT_TO_EMAIL || "carlosandresbeltran89@gmail.com";
+  process.env.CONTACT_TO_EMAIL || process.env.SMTP_USER || "";
 const getContactFrom = () =>
   process.env.CONTACT_FROM_EMAIL || process.env.SMTP_USER;
 

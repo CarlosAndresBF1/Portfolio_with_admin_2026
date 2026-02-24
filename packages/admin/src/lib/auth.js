@@ -6,6 +6,7 @@ import bcrypt from 'bcryptjs';
 import { prisma } from './prisma';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  trustHost: true,
   adapter: PrismaAdapter(prisma),
   providers: [
     Credentials({
@@ -34,6 +35,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   session: {
     strategy: 'jwt',
+    maxAge: 24 * 60 * 60, // 24 hours
   },
   callbacks: {
     jwt: async ({ token, user }) => {

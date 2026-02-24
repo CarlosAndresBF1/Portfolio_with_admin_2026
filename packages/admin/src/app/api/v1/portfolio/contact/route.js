@@ -33,6 +33,17 @@ export async function POST(request) {
       return Response.json({ error: 'All fields are required' }, { status: 400 });
     }
 
+    // Validate field lengths
+    if (name.length > 100 || email.length > 254 || subject.length > 200 || message.length > 5000) {
+      return Response.json({ error: 'Field length exceeds maximum' }, { status: 400 });
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return Response.json({ error: 'Invalid email format' }, { status: 400 });
+    }
+
     const submission = await prisma.contactSubmission.create({
       data: {
         name: sanitize(name),

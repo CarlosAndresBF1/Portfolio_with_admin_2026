@@ -5,10 +5,12 @@ import { redirect } from 'next/navigation';
 
 import { prisma } from 'src/lib/prisma';
 import { paths } from 'src/routes/paths';
+import { requireAuth } from 'src/lib/require-auth';
 
 // ─── Save Personal Info ───────────────────────────────────────────────────────
 
 export async function savePersonalInfo(formData) {
+  await requireAuth();
   const [esLang, enLang] = await Promise.all([
     prisma.language.findUnique({ where: { code: 'es' } }),
     prisma.language.findUnique({ where: { code: 'en' } }),
@@ -50,6 +52,7 @@ export async function savePersonalInfo(formData) {
 // ─── Save About Section ───────────────────────────────────────────────────────
 
 export async function saveAboutSection(formData) {
+  await requireAuth();
   const [esLang, enLang] = await Promise.all([
     prisma.language.findUnique({ where: { code: 'es' } }),
     prisma.language.findUnique({ where: { code: 'en' } }),

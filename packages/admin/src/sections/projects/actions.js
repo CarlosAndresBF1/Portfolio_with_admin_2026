@@ -5,8 +5,10 @@ import { redirect } from 'next/navigation';
 
 import { prisma } from 'src/lib/prisma';
 import { paths } from 'src/routes/paths';
+import { requireAuth } from 'src/lib/require-auth';
 
 export async function saveProject(formData) {
+  await requireAuth();
   const id = formData.get('id');
   const order = parseInt(formData.get('order') || '0', 10);
 
@@ -101,6 +103,7 @@ export async function saveProject(formData) {
 }
 
 export async function deleteProject(id) {
+  await requireAuth();
   await prisma.projectStack.deleteMany({ where: { projectId: id } });
   await prisma.projectTranslation.deleteMany({ where: { projectId: id } });
   await prisma.project.delete({ where: { id } });

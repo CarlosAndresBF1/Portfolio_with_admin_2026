@@ -13,8 +13,16 @@ module.exports = {
     },
   },
   async headers() {
-    const portfolioUrl = process.env.PORTFOLIO_URL || '*';
+    const portfolioUrl = process.env.PORTFOLIO_URL || 'http://localhost:4321';
     return [
+      {
+        source: '/:path*',
+        headers: [
+          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+        ],
+      },
       {
         source: '/api/v1/portfolio/:path*',
         headers: [

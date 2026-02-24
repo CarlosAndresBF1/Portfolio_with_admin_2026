@@ -5,8 +5,10 @@ import { redirect } from 'next/navigation';
 
 import { prisma } from 'src/lib/prisma';
 import { paths } from 'src/routes/paths';
+import { requireAuth } from 'src/lib/require-auth';
 
 export async function saveSkill(formData) {
+  await requireAuth();
   const id = formData.get('id');
   const years = formData.get('years') || '';
   const categoryId = formData.get('categoryId');

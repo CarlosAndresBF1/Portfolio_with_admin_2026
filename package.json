@@ -12,7 +12,7 @@
     "build": "pnpm --filter portfolio run build && pnpm --filter admin run build",
     "build:portfolio": "pnpm --filter portfolio run build",
     "build:admin": "pnpm --filter admin run build",
-    "test": "pnpm --filter portfolio run test",
+    "test": "pnpm --filter portfolio run test && pnpm --filter admin run test",
     "db:generate": "pnpm --filter admin run prisma:generate",
     "db:migrate": "pnpm --filter admin run prisma:migrate",
     "db:migrate:deploy": "pnpm --filter admin run prisma:migrate:deploy",

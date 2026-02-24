@@ -5,8 +5,10 @@ import { redirect } from 'next/navigation';
 
 import { prisma } from 'src/lib/prisma';
 import { paths } from 'src/routes/paths';
+import { requireAuth } from 'src/lib/require-auth';
 
 export async function saveExperienceJob(formData) {
+  await requireAuth();
   const id = formData.get('id');
   const company = formData.get('company');
   const number = formData.get('number');
@@ -79,6 +81,7 @@ export async function saveExperienceJob(formData) {
 }
 
 export async function deleteExperienceJob(id) {
+  await requireAuth();
   await prisma.experienceStack.deleteMany({ where: { jobId: id } });
   await prisma.experienceTranslation.deleteMany({ where: { jobId: id } });
   await prisma.experienceJob.delete({ where: { id } });

@@ -5,8 +5,10 @@ import { redirect } from 'next/navigation';
 
 import { prisma } from 'src/lib/prisma';
 import { paths } from 'src/routes/paths';
+import { requireAuth } from 'src/lib/require-auth';
 
 export async function saveSummaryCards(formData) {
+  await requireAuth();
   const [esLang, enLang] = await Promise.all([
     prisma.language.findUnique({ where: { code: 'es' } }),
     prisma.language.findUnique({ where: { code: 'en' } }),
