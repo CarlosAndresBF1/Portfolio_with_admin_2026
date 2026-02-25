@@ -163,6 +163,14 @@ jobs:
                       echo "── Sincronizando schema de la BD ──"
                       docker compose exec -T admin tsx scripts/sync-schema.ts
 
+                      # Garantizar que el usuario admin existe (SQL directo, sin depender de bcrypt en tsx)
+                      echo "── Verificando usuario admin ──"
+                      printf "INSERT INTO \"User\" (id, name, email, password) VALUES (gen_random_uuid()::text, 'Admin', '%s', '%s') ON CONFLICT (email) DO NOTHING;" \
+                        "${{ secrets.ADMIN_EMAIL }}" \
+                        '$2b$12$uPTiO9rGIRDfcoTmKbe5DOnmw5F2bD.BSKR8Z8FvurSeAMEDSTl9i' \
+                        | docker compose exec -T postgres psql -U ${{ secrets.POSTGRES_USER }} -d ${{ secrets.POSTGRES_DB }}
+                      echo "✓ Usuario admin verificado"
+
                       # Seed condicional: solo si la tabla Language está vacía (primer deploy)
                       ROW_COUNT=$(docker compose exec -T postgres psql -U ${{ secrets.POSTGRES_USER }} -d ${{ secrets.POSTGRES_DB }} -tAc "SELECT count(*) FROM \"Language\";" 2>/dev/null || echo "0")
                       if [ "$ROW_COUNT" = "0" ]; then
