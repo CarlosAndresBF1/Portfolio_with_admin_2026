@@ -11,8 +11,7 @@ portfolio-monorepo/
 │   └── admin/              # Panel CMS (Next.js 16 + TypeORM + NextAuth)
 ├── docker/
 │   └── postgres/
-│       ├── init.sql        # Schema inicial (DDL)
-│       └── seed.sql        # Datos de ejemplo (DML)
+│       └── init.sql        # Extensiones PostgreSQL
 ├── docker-compose.yml      # Orquestación producción (3 servicios)
 ├── docker-compose.dev.yml  # Override: solo PostgreSQL para dev local
 └── .github/workflows/
@@ -69,10 +68,10 @@ docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 ```bash
 pnpm install
 
-# Opción A: Seed via SQL (rápido, datos pre-generados)
-pnpm docker:seed:sql
+# Migrar schema + seed condicional
+pnpm db:migrate
 
-# Opción B: Seed via TypeORM (lee desde los JSON del portfolio)
+# O solo seed (re-inserta todos los datos)
 pnpm db:seed
 ```
 
@@ -103,14 +102,14 @@ Servicios disponibles:
 | Admin CMS | `${ADMIN_PORT}` (3000) | http://localhost:3000 |
 | Portfolio | `${PORTFOLIO_PORT}` (4321) | http://localhost:4321 |
 
-Después del primer despliegue, cargar datos iniciales:
+Después del primer despliegue, migrar y cargar datos:
 
 ```bash
-# Opción A: Seed via SQL
-docker compose exec -T postgres psql -U portfolio_user -d portfolio_db < docker/postgres/seed.sql
+# Migrar schema + seed condicional (todo en un paso)
+pnpm docker:migrate
 
-# Opción B: Seed via TypeORM
-docker compose exec admin npx tsx prisma/seed.ts
+# O solo seed (re-inserta todos los datos)
+pnpm docker:seed
 ```
 
 ### Comandos Docker útiles
@@ -133,8 +132,10 @@ docker compose down -v              # Detener y borrar datos (incluida BD)
 | `pnpm dev` | Inicia admin y portfolio en paralelo |
 | `pnpm build` | Construye ambos proyectos |
 | `pnpm test` | Ejecuta tests de portfolio y admin |
-| `pnpm db:seed` | Seed via TypeORM (lee JSON del portfolio) |
-| `pnpm docker:seed:sql` | Seed via SQL directo (datos pre-generados) |
+| `pnpm db:migrate` | Migrar schema + seed condicional |
+| `pnpm db:seed` | Seed via TypeORM (datos inline) |
+| `pnpm docker:migrate` | `docker compose exec admin tsx scripts/migrate.ts` |
+| `pnpm docker:seed` | `docker compose exec admin tsx scripts/seed.ts` |
 | `pnpm docker:up` | `docker compose up -d` |
 | `pnpm docker:up:build` | `docker compose up --build -d` |
 | `pnpm docker:down` | `docker compose down` |
@@ -149,6 +150,7 @@ docker compose down -v              # Detener y borrar datos (incluida BD)
 | `pnpm lint` | ESLint (errores + warnings) |
 | `pnpm lint:fix` | ESLint con auto-fix |
 | `pnpm test` | Vitest (38 tests) |
+| `pnpm typeorm:migrate` | Migrar schema + seed condicional |
 | `pnpm typeorm:seed` | Ejecuta seed.ts con TypeORM |
 
 ## Variables de entorno
