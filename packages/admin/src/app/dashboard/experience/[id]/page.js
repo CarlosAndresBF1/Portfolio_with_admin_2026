@@ -1,22 +1,22 @@
 import { notFound } from 'next/navigation';
 
-import { prisma } from 'src/lib/prisma';
+import { getDB } from 'src/lib/db';
 import ExperienceFormView from 'src/sections/experience/form-view';
 
 export const metadata = { title: 'Portfolio CMS: Editar Experiencia' };
 export const dynamic = 'force-dynamic';
 
+// eslint-disable-next-line react/prop-types
 export default async function Page({ params }) {
   const { id } = await params;
-  const job = await prisma.experienceJob.findUnique({
+  const db = await getDB();
+  const job = await db.getRepository('ExperienceJob').findOne({
     where: { id },
-    include: {
-      translations: { include: { language: true } },
-      stack: { orderBy: { order: 'asc' } },
-    },
+    relations: { translations: { language: true }, stack: true },
   });
 
   if (!job) notFound();
+  job.stack.sort((a, b) => a.order - b.order);
 
   return <ExperienceFormView job={job} />;
 }

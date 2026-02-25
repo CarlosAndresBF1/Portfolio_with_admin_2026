@@ -1,12 +1,10 @@
 'use server';
 
-import { prisma } from 'src/lib/prisma';
+import { getDB } from 'src/lib/db';
 import { requireAuth } from 'src/lib/require-auth';
 
 export async function markContactRead(id, read) {
   await requireAuth();
-  await prisma.contactSubmission.update({
-    where: { id },
-    data: { read },
-  });
+  const db = await getDB();
+  await db.getRepository('ContactSubmission').update({ id }, { read });
 }

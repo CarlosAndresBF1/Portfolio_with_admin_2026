@@ -70,16 +70,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Generate Prisma Client
-        run: pnpm db:generate
-        env:
-          DATABASE_URL: postgresql://portfolio_user:ci_test_password@localhost:5432/portfolio_db
-
-      - name: Run Prisma migrations
-        run: pnpm db:migrate:deploy
-        env:
-          DATABASE_URL: postgresql://portfolio_user:ci_test_password@localhost:5432/portfolio_db
-
       - name: Build admin
         run: pnpm build:admin
         env:

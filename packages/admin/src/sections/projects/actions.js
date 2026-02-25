@@ -3,12 +3,18 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
-import { prisma } from 'src/lib/prisma';
+import { getDB } from 'src/lib/db';
 import { paths } from 'src/routes/paths';
 import { requireAuth } from 'src/lib/require-auth';
 
 export async function saveProject(formData) {
   await requireAuth();
+  const db = await getDB();
+  const langRepo = db.getRepository('Language');
+  const projRepo = db.getRepository('Project');
+  const transRepo = db.getRepository('ProjectTranslation');
+  const stackRepo = db.getRepository('ProjectStack');
+
   const id = formData.get('id');
   const order = parseInt(formData.get('order') || '0', 10);
 
@@ -24,77 +30,44 @@ export async function saveProject(formData) {
     .filter(Boolean);
 
   const [esLang, enLang] = await Promise.all([
-    prisma.language.findUnique({ where: { code: 'es' } }),
-    prisma.language.findUnique({ where: { code: 'en' } }),
+    langRepo.findOneBy({ code: 'es' }),
+    langRepo.findOneBy({ code: 'en' }),
   ]);
 
   if (id) {
     // Update
-    await prisma.project.update({
-      where: { id },
-      data: { order },
-    });
+    await projRepo.update({ id }, { order });
 
     await Promise.all([
-      prisma.projectTranslation.upsert({
-        where: { projectId_languageId: { projectId: id, languageId: esLang.id } },
-        update: { title: esTitle, description: esDescription },
-        create: {
-          projectId: id,
-          languageId: esLang.id,
-          title: esTitle,
-          description: esDescription,
-        },
-      }),
-      prisma.projectTranslation.upsert({
-        where: { projectId_languageId: { projectId: id, languageId: enLang.id } },
-        update: { title: enTitle, description: enDescription },
-        create: {
-          projectId: id,
-          languageId: enLang.id,
-          title: enTitle,
-          description: enDescription,
-        },
-      }),
+      transRepo.upsert(
+        { projectId: id, languageId: esLang.id, title: esTitle, description: esDescription },
+        ['projectId', 'languageId']
+      ),
+      transRepo.upsert(
+        { projectId: id, languageId: enLang.id, title: enTitle, description: enDescription },
+        ['projectId', 'languageId']
+      ),
     ]);
 
-    await prisma.projectStack.deleteMany({ where: { projectId: id } });
+    await stackRepo.delete({ projectId: id });
     if (stackItems.length > 0) {
-      await prisma.projectStack.createMany({
-        data: stackItems.map((tech, idx) => ({ projectId: id, tech, order: idx })),
-      });
+      await stackRepo.save(
+        stackItems.map((tech, idx) => ({ projectId: id, tech, order: idx }))
+      );
     }
   } else {
     // Create
-    const project = await prisma.project.create({
-      data: { order },
-    });
+    const project = await projRepo.save({ order });
 
-    await prisma.projectTranslation.createMany({
-      data: [
-        {
-          projectId: project.id,
-          languageId: esLang.id,
-          title: esTitle,
-          description: esDescription,
-        },
-        {
-          projectId: project.id,
-          languageId: enLang.id,
-          title: enTitle,
-          description: enDescription,
-        },
-      ],
-    });
+    await transRepo.save([
+      { projectId: project.id, languageId: esLang.id, title: esTitle, description: esDescription },
+      { projectId: project.id, languageId: enLang.id, title: enTitle, description: enDescription },
+    ]);
 
     if (stackItems.length > 0) {
-      await prisma.projectStack.createMany({
-        data: stackItems.map((tech, idx) => ({
-          projectId: project.id,
-          tech,
-          order: idx,
-        })),
-      });
+      await stackRepo.save(
+        stackItems.map((tech, idx) => ({ projectId: project.id, tech, order: idx }))
+      );
     }
   }
 
@@ -104,8 +77,9 @@ export async function saveProject(formData) {
 
 export async function deleteProject(id) {
   await requireAuth();
-  await prisma.projectStack.deleteMany({ where: { projectId: id } });
-  await prisma.projectTranslation.deleteMany({ where: { projectId: id } });
-  await prisma.project.delete({ where: { id } });
+  const db = await getDB();
+  await db.getRepository('ProjectStack').delete({ projectId: id });
+  await db.getRepository('ProjectTranslation').delete({ projectId: id });
+  await db.getRepository('Project').delete({ id });
   revalidatePath(paths.dashboard.projects.root);
 }

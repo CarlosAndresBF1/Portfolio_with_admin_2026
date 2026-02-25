@@ -24,7 +24,7 @@ import { deleteExperienceJob } from './actions';
 
 export default function ExperienceListView({ jobs }) {
   const handleDelete = async (id) => {
-    if (!confirm('¿Eliminar este trabajo?')) return;
+    if (!window.confirm('¿Eliminar este trabajo?')) return;
     await deleteExperienceJob(id);
     window.location.reload();
   };

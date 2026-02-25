@@ -1,12 +1,13 @@
-import { prisma } from 'src/lib/prisma';
+import { getDB } from 'src/lib/db';
 import ContactSectionView from 'src/sections/content/contact-section-view';
 
 export const metadata = { title: 'Portfolio CMS: Sección Contacto' };
 export const dynamic = 'force-dynamic';
 
 export default async function Page() {
-  const translations = await prisma.contactSectionTranslation.findMany({
-    include: { language: true },
+  const db = await getDB();
+  const translations = await db.getRepository('ContactSectionTranslation').find({
+    relations: { language: true },
   });
 
   const esTranslation = translations.find((t) => t.language.code === 'es');

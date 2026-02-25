@@ -13,12 +13,8 @@
     "build:portfolio": "pnpm --filter portfolio run build",
     "build:admin": "pnpm --filter admin run build",
     "test": "pnpm --filter portfolio run test && pnpm --filter admin run test",
-    "db:generate": "pnpm --filter admin run prisma:generate",
-    "db:migrate": "pnpm --filter admin run prisma:migrate",
-    "db:migrate:deploy": "pnpm --filter admin run prisma:migrate:deploy",
-    "db:seed": "pnpm --filter admin run prisma:seed",
-    "db:studio": "pnpm --filter admin run prisma:studio",
-    "db:reset": "pnpm --filter admin run prisma:reset",
+    "db:migrate": "pnpm --filter admin run typeorm:migrate",
+    "db:seed": "pnpm --filter admin run typeorm:seed",
     "docker:up": "docker compose up -d",
     "docker:up:build": "docker compose up --build -d",
     "docker:down": "docker compose down",
@@ -29,7 +25,7 @@
     "docker:restart": "docker compose restart",
     "docker:ps": "docker compose ps",
     "docker:dev": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d",
-    "docker:migrate": "docker compose exec admin npx prisma migrate deploy",
+    "docker:migrate": "docker compose exec admin npx typeorm migration:run -d src/lib/data-source.js",
     "docker:seed": "docker compose exec admin npx tsx prisma/seed.ts",
     "docker:seed:sql": "docker compose exec -T postgres psql -U ${POSTGRES_USER:-portfolio_user} -d ${POSTGRES_DB:-portfolio_db} < docker/postgres/seed.sql"
   }

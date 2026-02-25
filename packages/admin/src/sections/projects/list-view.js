@@ -24,7 +24,7 @@ import { deleteProject } from './actions';
 
 export default function ProjectsListView({ projects }) {
   const handleDelete = async (id) => {
-    if (!confirm('¿Eliminar este proyecto?')) return;
+    if (!window.confirm('¿Eliminar este proyecto?')) return;
     await deleteProject(id);
     window.location.reload();
   };

@@ -12,13 +12,6 @@ COPY package.json pnpm-lock.yaml* ./
 # Install dependencies
 RUN pnpm install --frozen-lockfile 2>/dev/null || pnpm install
 
-# Copy Prisma schema & config first (for generate)
-COPY prisma ./prisma
-COPY prisma.config.ts ./
-
-# Generate Prisma Client
-RUN pnpm prisma:generate
-
 # Copy source code
 COPY . .
 
@@ -35,14 +28,15 @@ COPY --from=build /app/.next/standalone ./
 COPY --from=build /app/.next/static ./.next/static
 COPY --from=build /app/public ./public
 
-# Copy Prisma generated client + schema/migrations (for migrate deploy & seed)
-COPY --from=build /app/src/generated ./src/generated
+# Copy seed script + entities (for seed & future migrations)
 COPY --from=build /app/prisma ./prisma
-COPY --from=build /app/prisma.config.ts ./prisma.config.ts
+COPY --from=build /app/src/entities ./src/entities
+COPY --from=build /app/src/lib/db.js ./src/lib/db.js
+COPY --from=build /app/src/lib/data-source.js ./src/lib/data-source.js
 
-# Install migration tools in separate directory to avoid conflicts with standalone node_modules
+# Install migration/seed tools
 RUN mkdir -p /tools && cd /tools && npm init -y > /dev/null 2>&1 && \
-    npm install prisma dotenv tsx @prisma/adapter-pg > /dev/null 2>&1
+    npm install typeorm pg dotenv tsx bcryptjs > /dev/null 2>&1
 ENV NODE_PATH=/tools/node_modules
 ENV PATH="/tools/node_modules/.bin:$PATH"
 

@@ -3,12 +3,18 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
-import { prisma } from 'src/lib/prisma';
+import { getDB } from 'src/lib/db';
 import { paths } from 'src/routes/paths';
 import { requireAuth } from 'src/lib/require-auth';
 
 export async function saveExperienceJob(formData) {
   await requireAuth();
+  const db = await getDB();
+  const langRepo = db.getRepository('Language');
+  const jobRepo = db.getRepository('ExperienceJob');
+  const transRepo = db.getRepository('ExperienceTranslation');
+  const stackRepo = db.getRepository('ExperienceStack');
+
   const id = formData.get('id');
   const company = formData.get('company');
   const number = formData.get('number');
@@ -32,48 +38,43 @@ export async function saveExperienceJob(formData) {
     .filter(Boolean);
 
   const [esLang, enLang] = await Promise.all([
-    prisma.language.findUnique({ where: { code: 'es' } }),
-    prisma.language.findUnique({ where: { code: 'en' } }),
+    langRepo.findOneBy({ code: 'es' }),
+    langRepo.findOneBy({ code: 'en' }),
   ]);
 
   if (id) {
     // Update
-    await prisma.experienceJob.update({
-      where: { id },
-      data: { company, number, periodStart, periodEnd, order },
-    });
-    // Update translations
+    await jobRepo.update({ id }, { company, number, periodStart, periodEnd, order });
+    // Upsert translations
     await Promise.all([
-      prisma.experienceTranslation.upsert({
-        where: { jobId_languageId: { jobId: id, languageId: esLang.id } },
-        update: { role: esRole, summary: esSummary, details: esDetails },
-        create: { jobId: id, languageId: esLang.id, role: esRole, summary: esSummary, details: esDetails },
-      }),
-      prisma.experienceTranslation.upsert({
-        where: { jobId_languageId: { jobId: id, languageId: enLang.id } },
-        update: { role: enRole, summary: enSummary, details: enDetails },
-        create: { jobId: id, languageId: enLang.id, role: enRole, summary: enSummary, details: enDetails },
-      }),
+      transRepo.upsert(
+        { jobId: id, languageId: esLang.id, role: esRole, summary: esSummary, details: esDetails },
+        ['jobId', 'languageId']
+      ),
+      transRepo.upsert(
+        { jobId: id, languageId: enLang.id, role: enRole, summary: enSummary, details: enDetails },
+        ['jobId', 'languageId']
+      ),
     ]);
     // Replace stack
-    await prisma.experienceStack.deleteMany({ where: { jobId: id } });
-    await prisma.experienceStack.createMany({
-      data: stackItems.map((tech, idx) => ({ jobId: id, tech, order: idx })),
-    });
+    await stackRepo.delete({ jobId: id });
+    if (stackItems.length > 0) {
+      await stackRepo.save(
+        stackItems.map((tech, idx) => ({ jobId: id, tech, order: idx }))
+      );
+    }
   } else {
     // Create
-    const job = await prisma.experienceJob.create({
-      data: { company, number, periodStart, periodEnd, order },
-    });
-    await prisma.experienceTranslation.createMany({
-      data: [
-        { jobId: job.id, languageId: esLang.id, role: esRole, summary: esSummary, details: esDetails },
-        { jobId: job.id, languageId: enLang.id, role: enRole, summary: enSummary, details: enDetails },
-      ],
-    });
-    await prisma.experienceStack.createMany({
-      data: stackItems.map((tech, idx) => ({ jobId: job.id, tech, order: idx })),
-    });
+    const job = await jobRepo.save({ company, number, periodStart, periodEnd, order });
+    await transRepo.save([
+      { jobId: job.id, languageId: esLang.id, role: esRole, summary: esSummary, details: esDetails },
+      { jobId: job.id, languageId: enLang.id, role: enRole, summary: enSummary, details: enDetails },
+    ]);
+    if (stackItems.length > 0) {
+      await stackRepo.save(
+        stackItems.map((tech, idx) => ({ jobId: job.id, tech, order: idx }))
+      );
+    }
   }
 
   revalidatePath(paths.dashboard.experience.root);
@@ -82,8 +83,9 @@ export async function saveExperienceJob(formData) {
 
 export async function deleteExperienceJob(id) {
   await requireAuth();
-  await prisma.experienceStack.deleteMany({ where: { jobId: id } });
-  await prisma.experienceTranslation.deleteMany({ where: { jobId: id } });
-  await prisma.experienceJob.delete({ where: { id } });
+  const db = await getDB();
+  await db.getRepository('ExperienceStack').delete({ jobId: id });
+  await db.getRepository('ExperienceTranslation').delete({ jobId: id });
+  await db.getRepository('ExperienceJob').delete({ id });
   revalidatePath(paths.dashboard.experience.root);
 }

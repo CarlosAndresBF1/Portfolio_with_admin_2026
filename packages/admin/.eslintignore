@@ -20,3 +20,9 @@ src/reportWebVitals.ts
 src/service-worker.ts
 src/serviceWorkerRegistration.ts
 src/setupTests.ts
+
+# Prisma generated files (TypeScript, not parseable by JS eslint)
+src/generated/**
+
+# Dead icon exports (files removed from template)
+src/assets/icons/**

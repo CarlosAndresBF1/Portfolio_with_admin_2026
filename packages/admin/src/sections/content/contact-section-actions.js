@@ -3,15 +3,19 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
-import { prisma } from 'src/lib/prisma';
+import { getDB } from 'src/lib/db';
 import { paths } from 'src/routes/paths';
 import { requireAuth } from 'src/lib/require-auth';
 
 export async function saveContactSection(formData) {
   await requireAuth();
+  const db = await getDB();
+  const langRepo = db.getRepository('Language');
+  const csRepo = db.getRepository('ContactSectionTranslation');
+
   const [esLang, enLang] = await Promise.all([
-    prisma.language.findUnique({ where: { code: 'es' } }),
-    prisma.language.findUnique({ where: { code: 'en' } }),
+    langRepo.findOneBy({ code: 'es' }),
+    langRepo.findOneBy({ code: 'en' }),
   ]);
 
   const buildData = (lang) => ({
@@ -29,16 +33,14 @@ export async function saveContactSection(formData) {
   });
 
   await Promise.all([
-    prisma.contactSectionTranslation.upsert({
-      where: { languageId: esLang.id },
-      update: buildData('es'),
-      create: { languageId: esLang.id, ...buildData('es') },
-    }),
-    prisma.contactSectionTranslation.upsert({
-      where: { languageId: enLang.id },
-      update: buildData('en'),
-      create: { languageId: enLang.id, ...buildData('en') },
-    }),
+    csRepo.upsert(
+      { languageId: esLang.id, ...buildData('es'), updatedAt: new Date() },
+      ['languageId']
+    ),
+    csRepo.upsert(
+      { languageId: enLang.id, ...buildData('en'), updatedAt: new Date() },
+      ['languageId']
+    ),
   ]);
 
   revalidatePath(paths.dashboard.content.contactSection);

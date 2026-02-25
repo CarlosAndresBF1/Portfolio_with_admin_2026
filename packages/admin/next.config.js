@@ -1,6 +1,7 @@
 module.exports = {
   output: 'standalone',
   trailingSlash: true,
+  serverExternalPackages: ['typeorm', 'pg', 'pg-native'],
   modularizeImports: {
     '@mui/icons-material': {
       transform: '@mui/icons-material/{{member}}',

@@ -3,12 +3,18 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
-import { prisma } from 'src/lib/prisma';
+import { getDB } from 'src/lib/db';
 import { paths } from 'src/routes/paths';
 import { requireAuth } from 'src/lib/require-auth';
 
 export async function saveSkill(formData) {
   await requireAuth();
+  const db = await getDB();
+  const langRepo = db.getRepository('Language');
+  const skillRepo = db.getRepository('Skill');
+  const transRepo = db.getRepository('SkillTranslation');
+  const wpRepo = db.getRepository('SkillWorkplace');
+
   const id = formData.get('id');
   const years = formData.get('years') || '';
   const categoryId = formData.get('categoryId');
@@ -25,54 +31,38 @@ export async function saveSkill(formData) {
     .filter(Boolean);
 
   const [esLang, enLang] = await Promise.all([
-    prisma.language.findUnique({ where: { code: 'es' } }),
-    prisma.language.findUnique({ where: { code: 'en' } }),
+    langRepo.findOneBy({ code: 'es' }),
+    langRepo.findOneBy({ code: 'en' }),
   ]);
 
   if (id) {
     // Update base skill
-    await prisma.skill.update({
-      where: { id },
-      data: {
-        years,
-        ...(categoryId ? { categoryId } : {}),
-      },
-    });
+    const updateData = { years };
+    if (categoryId) updateData.categoryId = categoryId;
+    await skillRepo.update({ id }, updateData);
 
     // Upsert translations
     await Promise.all([
-      prisma.skillTranslation.upsert({
-        where: { skillId_languageId: { skillId: id, languageId: esLang.id } },
-        update: { name: esName, description: esDescription },
-        create: {
-          skillId: id,
-          languageId: esLang.id,
-          name: esName,
-          description: esDescription,
-        },
-      }),
-      prisma.skillTranslation.upsert({
-        where: { skillId_languageId: { skillId: id, languageId: enLang.id } },
-        update: { name: enName, description: enDescription },
-        create: {
-          skillId: id,
-          languageId: enLang.id,
-          name: enName,
-          description: enDescription,
-        },
-      }),
+      transRepo.upsert(
+        { skillId: id, languageId: esLang.id, name: esName, description: esDescription },
+        ['skillId', 'languageId']
+      ),
+      transRepo.upsert(
+        { skillId: id, languageId: enLang.id, name: enName, description: enDescription },
+        ['skillId', 'languageId']
+      ),
     ]);
 
     // Replace workplaces
-    await prisma.skillWorkplace.deleteMany({ where: { skillId: id } });
+    await wpRepo.delete({ skillId: id });
     if (workplaceItems.length > 0) {
-      await prisma.skillWorkplace.createMany({
-        data: workplaceItems.map((workplace, idx) => ({
+      await wpRepo.save(
+        workplaceItems.map((workplace, idx) => ({
           skillId: id,
           workplace,
           order: idx,
-        })),
-      });
+        }))
+      );
     }
   }
 

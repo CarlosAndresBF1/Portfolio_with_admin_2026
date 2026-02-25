@@ -1,4 +1,4 @@
-import { prisma } from 'src/lib/prisma';
+import { getDB } from 'src/lib/db';
 
 function validateApiKey(request) {
   const key = request.headers.get('x-api-key');
@@ -44,15 +44,14 @@ export async function POST(request) {
       return Response.json({ error: 'Invalid email format' }, { status: 400 });
     }
 
-    const submission = await prisma.contactSubmission.create({
-      data: {
-        name: sanitize(name),
-        email: sanitize(email),
-        subject: sanitize(subject),
-        message: sanitize(message),
-        ipAddress: ipAddress || null,
-        read: false,
-      },
+    const db = await getDB();
+    const submission = await db.getRepository('ContactSubmission').save({
+      name: sanitize(name),
+      email: sanitize(email),
+      subject: sanitize(subject),
+      message: sanitize(message),
+      ipAddress: ipAddress || null,
+      read: false,
     });
 
     return Response.json({ success: true, id: submission.id }, { status: 201 });

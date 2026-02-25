@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
-import { prisma } from 'src/lib/prisma';
+import { getDB } from 'src/lib/db';
 import { paths } from 'src/routes/paths';
 import { requireAuth } from 'src/lib/require-auth';
 
@@ -11,9 +11,13 @@ import { requireAuth } from 'src/lib/require-auth';
 
 export async function savePersonalInfo(formData) {
   await requireAuth();
+  const db = await getDB();
+  const langRepo = db.getRepository('Language');
+  const piRepo = db.getRepository('PersonalInfo');
+
   const [esLang, enLang] = await Promise.all([
-    prisma.language.findUnique({ where: { code: 'es' } }),
-    prisma.language.findUnique({ where: { code: 'en' } }),
+    langRepo.findOneBy({ code: 'es' }),
+    langRepo.findOneBy({ code: 'en' }),
   ]);
 
   const esData = {
@@ -33,16 +37,8 @@ export async function savePersonalInfo(formData) {
   };
 
   await Promise.all([
-    prisma.personalInfo.upsert({
-      where: { languageId: esLang.id },
-      update: esData,
-      create: { languageId: esLang.id, ...esData },
-    }),
-    prisma.personalInfo.upsert({
-      where: { languageId: enLang.id },
-      update: enData,
-      create: { languageId: enLang.id, ...enData },
-    }),
+    piRepo.upsert({ languageId: esLang.id, ...esData, updatedAt: new Date() }, ['languageId']),
+    piRepo.upsert({ languageId: enLang.id, ...enData, updatedAt: new Date() }, ['languageId']),
   ]);
 
   revalidatePath(paths.dashboard.content.personal);
@@ -53,9 +49,14 @@ export async function savePersonalInfo(formData) {
 
 export async function saveAboutSection(formData) {
   await requireAuth();
+  const db = await getDB();
+  const langRepo = db.getRepository('Language');
+  const aboutRepo = db.getRepository('AboutSection');
+  const circleRepo = db.getRepository('AboutCircleItem');
+
   const [esLang, enLang] = await Promise.all([
-    prisma.language.findUnique({ where: { code: 'es' } }),
-    prisma.language.findUnique({ where: { code: 'en' } }),
+    langRepo.findOneBy({ code: 'es' }),
+    langRepo.findOneBy({ code: 'en' }),
   ]);
 
   const parseCircleItems = (str) =>
@@ -86,41 +87,35 @@ export async function saveAboutSection(formData) {
   };
 
   // Upsert ES about section
-  const esAbout = await prisma.aboutSection.upsert({
-    where: { languageId: esLang.id },
-    update: esData,
-    create: { languageId: esLang.id, ...esData },
-  });
+  await aboutRepo.upsert({ languageId: esLang.id, ...esData, updatedAt: new Date() }, ['languageId']);
+  const esAbout = await aboutRepo.findOneBy({ languageId: esLang.id });
 
   // Upsert EN about section
-  const enAbout = await prisma.aboutSection.upsert({
-    where: { languageId: enLang.id },
-    update: enData,
-    create: { languageId: enLang.id, ...enData },
-  });
+  await aboutRepo.upsert({ languageId: enLang.id, ...enData, updatedAt: new Date() }, ['languageId']);
+  const enAbout = await aboutRepo.findOneBy({ languageId: enLang.id });
 
   // Replace circle items for ES
-  await prisma.aboutCircleItem.deleteMany({ where: { aboutSectionId: esAbout.id } });
+  await circleRepo.delete({ aboutSectionId: esAbout.id });
   if (esCircleItems.length > 0) {
-    await prisma.aboutCircleItem.createMany({
-      data: esCircleItems.map((label, idx) => ({
+    await circleRepo.save(
+      esCircleItems.map((label, idx) => ({
         aboutSectionId: esAbout.id,
         label,
         order: idx,
-      })),
-    });
+      }))
+    );
   }
 
   // Replace circle items for EN
-  await prisma.aboutCircleItem.deleteMany({ where: { aboutSectionId: enAbout.id } });
+  await circleRepo.delete({ aboutSectionId: enAbout.id });
   if (enCircleItems.length > 0) {
-    await prisma.aboutCircleItem.createMany({
-      data: enCircleItems.map((label, idx) => ({
+    await circleRepo.save(
+      enCircleItems.map((label, idx) => ({
         aboutSectionId: enAbout.id,
         label,
         order: idx,
-      })),
-    });
+      }))
+    );
   }
 
   revalidatePath(paths.dashboard.content.about);

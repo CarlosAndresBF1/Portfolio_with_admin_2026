@@ -1,13 +1,14 @@
-import { prisma } from 'src/lib/prisma';
+import { getDB } from 'src/lib/db';
 import SummaryView from 'src/sections/content/summary-view';
 
 export const metadata = { title: 'Portfolio CMS: Summary Cards' };
 export const dynamic = 'force-dynamic';
 
 export default async function Page() {
-  const summaryCards = await prisma.summaryCard.findMany({
-    orderBy: [{ order: 'asc' }, { languageId: 'asc' }],
-    include: { language: true },
+  const db = await getDB();
+  const summaryCards = await db.getRepository('SummaryCard').find({
+    order: { order: 'ASC', languageId: 'ASC' },
+    relations: { language: true },
   });
 
   const esCards = summaryCards.filter((c) => c.language.code === 'es');

@@ -1,4 +1,4 @@
-import { prisma } from 'src/lib/prisma';
+import { getDB } from 'src/lib/db';
 import DashboardOverview from 'src/sections/dashboard/view';
 
 export const metadata = { title: 'Portfolio CMS: Dashboard' };
@@ -6,16 +6,17 @@ export const metadata = { title: 'Portfolio CMS: Dashboard' };
 export const dynamic = 'force-dynamic';
 
 async function getStats() {
+  const db = await getDB();
   const [totalContacts, unreadContacts, totalJobs, totalSkills, totalProjects] = await Promise.all([
-    prisma.contactSubmission.count(),
-    prisma.contactSubmission.count({ where: { read: false } }),
-    prisma.experienceJob.count(),
-    prisma.skill.count(),
-    prisma.project.count(),
+    db.getRepository('ContactSubmission').count(),
+    db.getRepository('ContactSubmission').count({ where: { read: false } }),
+    db.getRepository('ExperienceJob').count(),
+    db.getRepository('Skill').count(),
+    db.getRepository('Project').count(),
   ]);
 
-  const recentContacts = await prisma.contactSubmission.findMany({
-    orderBy: { createdAt: 'desc' },
+  const recentContacts = await db.getRepository('ContactSubmission').find({
+    order: { createdAt: 'DESC' },
     take: 5,
   });
 

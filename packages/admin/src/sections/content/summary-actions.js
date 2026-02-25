@@ -3,15 +3,19 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
-import { prisma } from 'src/lib/prisma';
+import { getDB } from 'src/lib/db';
 import { paths } from 'src/routes/paths';
 import { requireAuth } from 'src/lib/require-auth';
 
 export async function saveSummaryCards(formData) {
   await requireAuth();
+  const db = await getDB();
+  const langRepo = db.getRepository('Language');
+  const cardRepo = db.getRepository('SummaryCard');
+
   const [esLang, enLang] = await Promise.all([
-    prisma.language.findUnique({ where: { code: 'es' } }),
-    prisma.language.findUnique({ where: { code: 'en' } }),
+    langRepo.findOneBy({ code: 'es' }),
+    langRepo.findOneBy({ code: 'en' }),
   ]);
 
   const CARD_COUNT = 6;
@@ -27,15 +31,10 @@ export async function saveSummaryCards(formData) {
       const text = formData.get(`${code}_card_${i}_text`) || '';
 
       if (id) {
-        return prisma.summaryCard.update({
-          where: { id },
-          data: { order, title, heading, text },
-        });
+        return cardRepo.save({ id, order, title, heading, text });
       }
 
-      return prisma.summaryCard.create({
-        data: { languageId: langId, order, title, heading, text },
-      });
+      return cardRepo.save({ languageId: langId, order, title, heading, text });
     });
   };
 

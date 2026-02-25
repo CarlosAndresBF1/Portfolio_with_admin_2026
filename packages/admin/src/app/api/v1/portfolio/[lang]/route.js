@@ -1,4 +1,4 @@
-import { prisma } from 'src/lib/prisma';
+import { getDB } from 'src/lib/db';
 
 const SUPPORTED_LANGS = ['en', 'es'];
 
@@ -22,17 +22,18 @@ export async function GET(request, { params }) {
   }
 
   try {
-    const language = await prisma.language.findUnique({
+    const db = await getDB();
+    const langRepo = db.getRepository('Language');
+
+    const language = await langRepo.findOne({
       where: { code: lang },
-      include: {
+      relations: {
         personalInfos: true,
         metaSeos: true,
         navLabels: true,
-        aboutSections: {
-          include: { circleItems: { orderBy: { order: 'asc' } } },
-        },
-        summaryCards: { orderBy: { order: 'asc' } },
-        marqueeItems: { orderBy: { order: 'asc' } },
+        aboutSections: { circleItems: true },
+        summaryCards: true,
+        marqueeItems: true,
         contactSectionTranslations: true,
         footerTranslations: true,
       },
@@ -42,36 +43,53 @@ export async function GET(request, { params }) {
       return Response.json({ error: 'Language not found' }, { status: 404 });
     }
 
+    // Sort relations in JS
+    if (language.aboutSections) {
+      language.aboutSections.forEach((a) =>
+        a.circleItems.sort((x, y) => x.order - y.order)
+      );
+    }
+    if (language.summaryCards) language.summaryCards.sort((a, b) => a.order - b.order);
+    if (language.marqueeItems) language.marqueeItems.sort((a, b) => a.order - b.order);
+
+    // Fetch jobs, skills, projects with filtered translations via QueryBuilder
+    const jobRepo = db.getRepository('ExperienceJob');
+    const catRepo = db.getRepository('SkillCategory');
+    const projRepo = db.getRepository('Project');
+
     const [jobs, skillCategories, projects] = await Promise.all([
-      prisma.experienceJob.findMany({
-        orderBy: { order: 'asc' },
-        include: {
-          translations: {
-            where: { language: { code: lang } },
-          },
-          stack: { orderBy: { order: 'asc' } },
-        },
-      }),
-      prisma.skillCategory.findMany({
-        orderBy: { order: 'asc' },
-        include: {
-          translations: { where: { language: { code: lang } } },
-          skills: {
-            orderBy: { order: 'asc' },
-            include: {
-              translations: { where: { language: { code: lang } } },
-              workplaces: { orderBy: { order: 'asc' } },
-            },
-          },
-        },
-      }),
-      prisma.project.findMany({
-        orderBy: { order: 'asc' },
-        include: {
-          translations: { where: { language: { code: lang } } },
-          stack: { orderBy: { order: 'asc' } },
-        },
-      }),
+      jobRepo
+        .createQueryBuilder('job')
+        .leftJoinAndSelect('job.translations', 'jt', 'jt.languageId = :langId', {
+          langId: language.id,
+        })
+        .leftJoinAndSelect('job.stack', 'js')
+        .orderBy('job.order', 'ASC')
+        .addOrderBy('js.order', 'ASC')
+        .getMany(),
+      catRepo
+        .createQueryBuilder('cat')
+        .leftJoinAndSelect('cat.translations', 'ct', 'ct.languageId = :langId', {
+          langId: language.id,
+        })
+        .leftJoinAndSelect('cat.skills', 'skill')
+        .leftJoinAndSelect('skill.translations', 'st', 'st.languageId = :langId', {
+          langId: language.id,
+        })
+        .leftJoinAndSelect('skill.workplaces', 'sw')
+        .orderBy('cat.order', 'ASC')
+        .addOrderBy('skill.order', 'ASC')
+        .addOrderBy('sw.order', 'ASC')
+        .getMany(),
+      projRepo
+        .createQueryBuilder('proj')
+        .leftJoinAndSelect('proj.translations', 'pt', 'pt.languageId = :langId', {
+          langId: language.id,
+        })
+        .leftJoinAndSelect('proj.stack', 'ps')
+        .orderBy('proj.order', 'ASC')
+        .addOrderBy('ps.order', 'ASC')
+        .getMany(),
     ]);
 
     const personalInfo = language.personalInfos[0] || {};

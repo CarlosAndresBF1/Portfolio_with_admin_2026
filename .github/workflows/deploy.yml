@@ -108,9 +108,6 @@ jobs:
                       echo "Esperando a PostgreSQL..."
                       timeout 60 bash -c 'until docker compose exec -T postgres pg_isready -U ${{ secrets.POSTGRES_USER }} -d ${{ secrets.POSTGRES_DB }}; do sleep 2; done'
 
-                      # Ejecutar migraciones de Prisma
-                      docker compose exec -T admin npx prisma migrate deploy
-
                       # Seed inicial (solo si es la primera vez o se quiere forzar)
                       # docker compose exec -T postgres psql -U ${{ secrets.POSTGRES_USER }} -d ${{ secrets.POSTGRES_DB }} < docker/postgres/seed.sql
 

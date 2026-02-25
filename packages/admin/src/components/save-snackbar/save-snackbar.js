@@ -1,5 +1,6 @@
 'use client';
 
+import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 
 import Alert from '@mui/material/Alert';
@@ -7,7 +8,7 @@ import Snackbar from '@mui/material/Snackbar';
 
 import { useSearchParams, useRouter, usePathname } from 'src/routes/hooks';
 
-export default function SaveSnackbar({ message = '¡Guardado exitosamente!' }) {
+export default function SaveSnackbar({ message }) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -34,3 +35,11 @@ export default function SaveSnackbar({ message = '¡Guardado exitosamente!' }) {
     </Snackbar>
   );
 }
+
+SaveSnackbar.propTypes = {
+  message: PropTypes.string,
+};
+
+SaveSnackbar.defaultProps = {
+  message: '¡Guardado exitosamente!',
+};
