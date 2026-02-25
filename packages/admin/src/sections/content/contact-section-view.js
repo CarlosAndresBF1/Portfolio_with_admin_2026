@@ -13,6 +13,7 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 
 import Iconify from 'src/components/iconify';
+import SaveSnackbar from 'src/components/save-snackbar/save-snackbar';
 import { saveContactSection } from './contact-section-actions';
 
 // ─── Fields per language ──────────────────────────────────────────────────────
@@ -129,6 +130,7 @@ export default function ContactSectionView({ esTranslation, enTranslation }) {
 
   return (
     <Box sx={{ p: 3, maxWidth: 800 }}>
+      <SaveSnackbar />
       <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 3 }}>
         <Typography variant="h4">Sección Contacto</Typography>
       </Stack>
@@ -140,12 +142,12 @@ export default function ContactSectionView({ esTranslation, enTranslation }) {
               <Tab label="Español" />
               <Tab label="English" />
             </Tabs>
-            {langTab === 0 && (
+            <Box sx={{ display: langTab === 0 ? 'block' : 'none' }}>
               <ContactSectionFields lang="es" translation={esTranslation} />
-            )}
-            {langTab === 1 && (
+            </Box>
+            <Box sx={{ display: langTab === 1 ? 'block' : 'none' }}>
               <ContactSectionFields lang="en" translation={enTranslation} />
-            )}
+            </Box>
           </Box>
 
           <Stack direction="row" spacing={2} justifyContent="flex-end">

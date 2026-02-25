@@ -19,6 +19,7 @@ import { paths } from 'src/routes/paths';
 import { RouterLink } from 'src/routes/components';
 
 import Iconify from 'src/components/iconify';
+import SaveSnackbar from 'src/components/save-snackbar/save-snackbar';
 import { deleteProject } from './actions';
 
 export default function ProjectsListView({ projects }) {
@@ -30,6 +31,7 @@ export default function ProjectsListView({ projects }) {
 
   return (
     <Box sx={{ p: 3 }}>
+      <SaveSnackbar />
       <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 3 }}>
         <Typography variant="h4">Proyectos</Typography>
         <Button

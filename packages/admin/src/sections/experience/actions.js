@@ -77,7 +77,7 @@ export async function saveExperienceJob(formData) {
   }
 
   revalidatePath(paths.dashboard.experience.root);
-  redirect(paths.dashboard.experience.root);
+  redirect(`${paths.dashboard.experience.root}?saved=1`);
 }
 
 export async function deleteExperienceJob(id) {

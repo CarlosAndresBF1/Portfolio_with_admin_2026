@@ -45,5 +45,5 @@ export async function saveSummaryCards(formData) {
   await Promise.all([...esUpdates, ...enUpdates]);
 
   revalidatePath(paths.dashboard.content.summary);
-  redirect(paths.dashboard.content.summary);
+  redirect(`${paths.dashboard.content.summary}?saved=1`);
 }

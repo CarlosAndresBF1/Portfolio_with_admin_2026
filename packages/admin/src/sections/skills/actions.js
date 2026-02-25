@@ -77,5 +77,5 @@ export async function saveSkill(formData) {
   }
 
   revalidatePath(paths.dashboard.skills.root);
-  redirect(paths.dashboard.skills.root);
+  redirect(`${paths.dashboard.skills.root}?saved=1`);
 }

@@ -7,8 +7,9 @@ export const metadata = { title: 'Portfolio CMS: Editar Proyecto' };
 export const dynamic = 'force-dynamic';
 
 export default async function Page({ params }) {
+  const { id } = await params;
   const project = await prisma.project.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: {
       translations: { include: { language: true } },
       stack: { orderBy: { order: 'asc' } },

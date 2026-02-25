@@ -99,7 +99,7 @@ export async function saveProject(formData) {
   }
 
   revalidatePath(paths.dashboard.projects.root);
-  redirect(paths.dashboard.projects.root);
+  redirect(`${paths.dashboard.projects.root}?saved=1`);
 }
 
 export async function deleteProject(id) {

@@ -18,10 +18,12 @@ import { paths } from 'src/routes/paths';
 import { RouterLink } from 'src/routes/components';
 
 import Iconify from 'src/components/iconify';
+import SaveSnackbar from 'src/components/save-snackbar/save-snackbar';
 
 export default function SkillsView({ categories }) {
   return (
     <Box sx={{ p: 3 }}>
+      <SaveSnackbar />
       <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 3 }}>
         <Typography variant="h4">Skills</Typography>
       </Stack>

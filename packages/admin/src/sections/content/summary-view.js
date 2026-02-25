@@ -15,6 +15,7 @@ import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 
 import Iconify from 'src/components/iconify';
+import SaveSnackbar from 'src/components/save-snackbar/save-snackbar';
 import { saveSummaryCards } from './summary-actions';
 
 // ─── Single card fields ───────────────────────────────────────────────────────
@@ -103,6 +104,7 @@ export default function SummaryView({ esCards, enCards }) {
 
   return (
     <Box sx={{ p: 3, maxWidth: 900 }}>
+      <SaveSnackbar />
       <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 3 }}>
         <Typography variant="h4">Summary Cards</Typography>
       </Stack>
@@ -114,8 +116,12 @@ export default function SummaryView({ esCards, enCards }) {
               <Tab label="Español" />
               <Tab label="English" />
             </Tabs>
-            {langTab === 0 && <SummaryLangFields lang="es" cards={esCards} />}
-            {langTab === 1 && <SummaryLangFields lang="en" cards={enCards} />}
+            <Box sx={{ display: langTab === 0 ? 'block' : 'none' }}>
+              <SummaryLangFields lang="es" cards={esCards} />
+            </Box>
+            <Box sx={{ display: langTab === 1 ? 'block' : 'none' }}>
+              <SummaryLangFields lang="en" cards={enCards} />
+            </Box>
           </Box>
 
           <Stack direction="row" spacing={2} justifyContent="flex-end">

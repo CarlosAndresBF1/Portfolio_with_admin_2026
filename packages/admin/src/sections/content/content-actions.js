@@ -46,7 +46,7 @@ export async function savePersonalInfo(formData) {
   ]);
 
   revalidatePath(paths.dashboard.content.personal);
-  redirect(paths.dashboard.content.personal);
+  redirect(`${paths.dashboard.content.personal}?saved=1`);
 }
 
 // ─── Save About Section ───────────────────────────────────────────────────────
@@ -124,5 +124,5 @@ export async function saveAboutSection(formData) {
   }
 
   revalidatePath(paths.dashboard.content.about);
-  redirect(paths.dashboard.content.about);
+  redirect(`${paths.dashboard.content.about}?saved=1`);
 }

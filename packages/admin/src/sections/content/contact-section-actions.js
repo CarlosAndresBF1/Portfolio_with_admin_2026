@@ -42,5 +42,5 @@ export async function saveContactSection(formData) {
   ]);
 
   revalidatePath(paths.dashboard.content.contactSection);
-  redirect(paths.dashboard.content.contactSection);
+  redirect(`${paths.dashboard.content.contactSection}?saved=1`);
 }

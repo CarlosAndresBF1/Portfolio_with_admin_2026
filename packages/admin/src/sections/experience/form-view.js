@@ -194,15 +194,20 @@ export default function ExperienceFormView({ job }) {
               <Tab label="🇨🇴 Español" />
               <Tab label="🇺🇸 English" />
             </Tabs>
-            {langTab === 0 && <TranslationFields lang="es" translation={esTranslation} />}
-            {langTab === 1 && <TranslationFields lang="en" translation={enTranslation} />}
+            <Box sx={{ display: langTab === 0 ? 'block' : 'none' }}>
+              <TranslationFields lang="es" translation={esTranslation} />
+            </Box>
+            <Box sx={{ display: langTab === 1 ? 'block' : 'none' }}>
+              <TranslationFields lang="en" translation={enTranslation} />
+            </Box>
           </Box>
 
           <Stack direction="row" spacing={2} justifyContent="flex-end">
-            <Button component={RouterLink} href={paths.dashboard.experience.root} color="inherit">
-              Cancelar
-            </Button>
-            <Button type="submit" variant="contained" startIcon={<Iconify icon="solar:diskette-bold" />}>
+            <Button
+              type="submit"
+              variant="contained"
+              startIcon={<Iconify icon="solar:diskette-bold" />}
+            >
               Guardar
             </Button>
           </Stack>

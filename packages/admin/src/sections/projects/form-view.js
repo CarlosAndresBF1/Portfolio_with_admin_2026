@@ -156,12 +156,12 @@ export default function ProjectFormView({ project }) {
               <Tab label="Español" />
               <Tab label="English" />
             </Tabs>
-            {langTab === 0 && (
+            <Box sx={{ display: langTab === 0 ? 'block' : 'none' }}>
               <TranslationFields lang="es" translation={esTranslation} />
-            )}
-            {langTab === 1 && (
+            </Box>
+            <Box sx={{ display: langTab === 1 ? 'block' : 'none' }}>
               <TranslationFields lang="en" translation={enTranslation} />
-            )}
+            </Box>
           </Box>
 
           <Stack direction="row" spacing={2} justifyContent="flex-end">

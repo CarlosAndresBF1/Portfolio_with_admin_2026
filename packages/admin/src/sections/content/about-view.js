@@ -13,6 +13,7 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 
 import Iconify from 'src/components/iconify';
+import SaveSnackbar from 'src/components/save-snackbar/save-snackbar';
 import { saveAboutSection } from './content-actions';
 
 // ─── Circle items chip input ──────────────────────────────────────────────────
@@ -139,6 +140,7 @@ export default function AboutView({ esAbout, enAbout }) {
 
   return (
     <Box sx={{ p: 3, maxWidth: 800 }}>
+      <SaveSnackbar />
       <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 3 }}>
         <Typography variant="h4">Sección About</Typography>
       </Stack>
@@ -150,8 +152,12 @@ export default function AboutView({ esAbout, enAbout }) {
               <Tab label="Español" />
               <Tab label="English" />
             </Tabs>
-            {langTab === 0 && <AboutFields lang="es" about={esAbout} />}
-            {langTab === 1 && <AboutFields lang="en" about={enAbout} />}
+            <Box sx={{ display: langTab === 0 ? 'block' : 'none' }}>
+              <AboutFields lang="es" about={esAbout} />
+            </Box>
+            <Box sx={{ display: langTab === 1 ? 'block' : 'none' }}>
+              <AboutFields lang="en" about={enAbout} />
+            </Box>
           </Box>
 
           <Stack direction="row" spacing={2} justifyContent="flex-end">

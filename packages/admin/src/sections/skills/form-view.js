@@ -186,8 +186,12 @@ export default function SkillFormView({ skill, categories }) {
               <Tab label="Español" />
               <Tab label="English" />
             </Tabs>
-            {langTab === 0 && <TranslationFields lang="es" translation={esTranslation} />}
-            {langTab === 1 && <TranslationFields lang="en" translation={enTranslation} />}
+            <Box sx={{ display: langTab === 0 ? 'block' : 'none' }}>
+              <TranslationFields lang="es" translation={esTranslation} />
+            </Box>
+            <Box sx={{ display: langTab === 1 ? 'block' : 'none' }}>
+              <TranslationFields lang="en" translation={enTranslation} />
+            </Box>
           </Box>
 
           <Stack direction="row" spacing={2} justifyContent="flex-end">

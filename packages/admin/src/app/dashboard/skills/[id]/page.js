@@ -7,9 +7,10 @@ export const metadata = { title: 'Portfolio CMS: Editar Skill' };
 export const dynamic = 'force-dynamic';
 
 export default async function Page({ params }) {
+  const { id } = await params;
   const [skill, categories] = await Promise.all([
     prisma.skill.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         translations: { include: { language: true } },
         workplaces: { orderBy: { order: 'asc' } },
