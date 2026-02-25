@@ -57,7 +57,7 @@ export async function GET(request, { params }) {
     const catRepo = db.getRepository('SkillCategory');
     const projRepo = db.getRepository('Project');
 
-    const [jobs, skillCategories, projects] = await Promise.all([
+    const [jobs, skillCategories, projects, socialLinks] = await Promise.all([
       jobRepo
         .createQueryBuilder('job')
         .leftJoinAndSelect('job.translations', 'jt', 'jt.languageId = :langId', {
@@ -90,6 +90,10 @@ export async function GET(request, { params }) {
         .orderBy('proj.order', 'ASC')
         .addOrderBy('ps.order', 'ASC')
         .getMany(),
+      db.getRepository('SocialLink').find({
+        where: { visible: true },
+        order: { order: 'ASC' },
+      }),
     ]);
 
     const personalInfo = language.personalInfos[0] || {};
@@ -195,6 +199,12 @@ export async function GET(request, { params }) {
         name: footer.name || '',
         email: footer.email || '',
       },
+      socialLinks: socialLinks.map((link) => ({
+        platform: link.platform,
+        label: link.label,
+        url: lang === 'en' && link.urlEn ? link.urlEn : link.url,
+        icon: link.icon,
+      })),
       switchLang: personalInfo.switchLang || (lang === 'es' ? 'EN' : 'ES'),
     };
 

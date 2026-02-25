@@ -549,6 +549,25 @@ export const FooterTranslation = new EntitySchema({
   },
 });
 
+// ─── Social Links ─────────────────────────────────────────────────────────────
+
+export const SocialLink = new EntitySchema({
+  name: 'SocialLink',
+  tableName: 'SocialLink',
+  columns: {
+    id: { type: 'text', primary: true, default: () => "gen_random_uuid()" },
+    platform: { type: 'text' },
+    label: { type: 'text' },
+    url: { type: 'text' },
+    urlEn: { type: 'text', nullable: true },
+    icon: { type: 'text' },
+    order: { type: 'int', default: 0 },
+    visible: { type: 'boolean', default: true },
+    createdAt: { type: 'timestamp', precision: 3, createDate: true },
+    updatedAt: { type: 'timestamp', precision: 3, updateDate: true },
+  },
+});
+
 // ─── Contact Form Submissions ─────────────────────────────────────────────────
 
 export const ContactSubmission = new EntitySchema({
@@ -678,6 +697,7 @@ export const allEntities = [
   ContactSectionTranslation,
   FooterTranslation,
   ContactSubmission,
+  SocialLink,
   User,
   Account,
   Session,

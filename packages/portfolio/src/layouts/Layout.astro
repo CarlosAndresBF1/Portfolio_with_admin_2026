@@ -90,11 +90,9 @@ const keywords =
           addressRegion: "Tolima",
           addressCountry: "CO",
         },
-        sameAs: [
-          "https://www.linkedin.com/in/carlos-andrés-beltrán-franco-3b17a649",
-          "https://github.com/CarlosAndresBF1",
-          "https://gitlab.com/carlosandresbf",
-        ],
+        sameAs: (t.socialLinks || [])
+          .filter((l: { platform: string; url: string }) => l.platform !== 'email' && l.platform !== 'whatsapp')
+          .map((l: { url: string }) => l.url),
         knowsAbout: [
           "PHP",
           "Laravel",

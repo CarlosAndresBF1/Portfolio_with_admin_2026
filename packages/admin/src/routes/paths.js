@@ -38,6 +38,8 @@ export const paths = {
       new: `${ROOTS.DASHBOARD}/projects/new`,
       edit: (id) => `${ROOTS.DASHBOARD}/projects/${id}`,
     },
+    // Social links
+    socialLinks: `${ROOTS.DASHBOARD}/social-links`,
     // Contactos recibidos
     contacts: `${ROOTS.DASHBOARD}/contacts`,
     // Perfil

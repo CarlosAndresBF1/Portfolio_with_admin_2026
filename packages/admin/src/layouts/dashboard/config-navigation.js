@@ -61,6 +61,11 @@ export function useNavData() {
             icon: ICONS.booking,
           },
           {
+            title: 'Social Links',
+            path: paths.dashboard.socialLinks,
+            icon: ICONS.blog,
+          },
+          {
             title: 'Contactos',
             path: paths.dashboard.contacts,
             icon: ICONS.chat,
