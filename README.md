@@ -259,8 +259,8 @@ TypeORM define 26 entidades en `packages/admin/src/entities/index.js`:
 ## Tests
 
 ```bash
-pnpm test                              # Todos (100 tests)
-pnpm --filter portfolio run test       # Portfolio (62 tests)
+pnpm test                              # Todos (65 tests)
+pnpm --filter portfolio run test       # Portfolio (27 tests)
 pnpm --filter admin run test           # Admin (38 tests)
 pnpm --filter portfolio run test:watch # Watch mode
 pnpm --filter admin run test:watch

@@ -1,6 +1,3 @@
-import enFallback from "./en.example.json";
-import esFallback from "./es.example.json";
-
 export type Lang = "en" | "es";
 export const defaultLang: Lang = "es";
 export const supportedLangs: Lang[] = ["en", "es"];
@@ -16,11 +13,6 @@ interface CacheEntry {
 const cache = new Map<string, CacheEntry>();
 const CACHE_TTL = 60_000;
 
-const fallbackData: Record<Lang, unknown> = {
-  en: enFallback,
-  es: esFallback,
-};
-
 /**
  * Precarga y cachea los datos del portfolio desde el Admin API.
  * Llamar en el frontmatter de la página antes de pasar lang a los componentes.
@@ -33,12 +25,9 @@ export async function getTranslations(lang: Lang): Promise<unknown> {
   }
 
   if (!ADMIN_API_URL || !INTERNAL_API_KEY) {
-    console.warn(
-      `[i18n] Missing env vars — ADMIN_API_URL: ${!!ADMIN_API_URL}, INTERNAL_API_KEY: ${!!INTERNAL_API_KEY}. Using fallback data.`,
+    throw new Error(
+      `[i18n] Missing env vars — ADMIN_API_URL: ${!!ADMIN_API_URL}, INTERNAL_API_KEY: ${!!INTERNAL_API_KEY}. Cannot fetch portfolio data.`,
     );
-    const fallback = fallbackData[lang];
-    cache.set(key, { data: fallback, ts: Date.now() });
-    return fallback;
   }
 
   try {
@@ -62,22 +51,22 @@ export async function getTranslations(lang: Lang): Promise<unknown> {
     console.error(`[i18n] Error fetching ${lang}:`, err);
     const stale = cache.get(key);
     if (stale) return stale.data;
-    const fallback = fallbackData[lang];
-    cache.set(key, { data: fallback, ts: Date.now() });
-    return fallback;
+    throw err;
   }
 }
 
 /**
  * Retorna los datos cacheados sincronamente.
  * Requiere haber llamado getTranslations(lang) antes.
- * Los componentes usan esto sin necesitar cambios.
  */
 export function useTranslations(lang: Lang): any {
   const cached = cache.get(`portfolio_${lang}`);
-  if (cached) return cached.data;
-  // Fallback inmediato si getTranslations no fue llamado antes
-  return fallbackData[lang];
+  if (!cached) {
+    throw new Error(
+      `[i18n] No cached data for "${lang}". Call getTranslations(lang) first.`,
+    );
+  }
+  return cached.data;
 }
 
 // Helpers sin cambios

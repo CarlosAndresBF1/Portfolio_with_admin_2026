@@ -22,10 +22,6 @@ packages/*/.env.production
 !.env.example
 !packages/*/.env.example
 
-# ── Personal i18n data ────────────────────────
-packages/portfolio/src/i18n/en.json
-packages/portfolio/src/i18n/es.json
-
 # ── macOS ─────────────────────────────────────
 .DS_Store
 

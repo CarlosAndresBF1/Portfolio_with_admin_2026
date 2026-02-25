@@ -3,7 +3,6 @@ import {
   supportedLangs,
   defaultLang,
   getLangFromUrl,
-  useTranslations,
   getLocalizedPath,
   getAlternateLang,
 } from "../src/i18n/index.ts";
@@ -46,20 +45,6 @@ describe("i18n Utility Functions", () => {
     it("should return defaultLang for root path", () => {
       const url = new URL("http://localhost/");
       expect(getLangFromUrl(url)).toBe(defaultLang);
-    });
-  });
-
-  describe("useTranslations", () => {
-    it("should return English translations", () => {
-      const t = useTranslations("en");
-      expect(t.lang).toBe("en");
-      expect(t.nav.home).toBe("Home");
-    });
-
-    it("should return Spanish translations", () => {
-      const t = useTranslations("es");
-      expect(t.lang).toBe("es");
-      expect(t.nav.home).toBe("Inicio");
     });
   });
 
