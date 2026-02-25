@@ -5,7 +5,8 @@
  * Uso: pnpm --filter admin run typeorm:seed
  */
 
-import 'dotenv/config';
+// dotenv solo es necesario en desarrollo local; en Docker las env vars vienen de compose
+try { require('dotenv/config'); } catch {}
 import path from 'path';
 import fs from 'fs';
 import bcrypt from 'bcryptjs';

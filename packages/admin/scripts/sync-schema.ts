@@ -5,7 +5,8 @@
  * Uso: npx tsx scripts/sync-schema.ts
  */
 
-import 'dotenv/config';
+// dotenv solo es necesario en desarrollo local; en Docker las env vars vienen de compose
+try { require('dotenv/config'); } catch {}
 import { DataSource } from 'typeorm';
 import { allEntities } from '../src/entities';
 
