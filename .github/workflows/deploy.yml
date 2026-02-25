@@ -163,10 +163,14 @@ jobs:
                       echo "── Sincronizando schema de la BD ──"
                       docker compose exec -T admin tsx scripts/sync-schema.ts
 
-                      # El seed NO se ejecuta automáticamente.
-                      # Los datos se gestionan desde el panel admin.
-                      # Para poblar la BD por primera vez, ejecutar manualmente en el VPS:
-                      #   docker compose exec -T postgres psql -U portfolio_user -d portfolio_db < docker/postgres/seed.sql
+                      # Seed condicional: solo si la tabla Language está vacía (primer deploy)
+                      ROW_COUNT=$(docker compose exec -T postgres psql -U ${{ secrets.POSTGRES_USER }} -d ${{ secrets.POSTGRES_DB }} -tAc "SELECT count(*) FROM \"Language\";" 2>/dev/null || echo "0")
+                      if [ "$ROW_COUNT" = "0" ]; then
+                          echo "── BD vacía — ejecutando seed inicial ──"
+                          docker compose exec -T postgres psql -U ${{ secrets.POSTGRES_USER }} -d ${{ secrets.POSTGRES_DB }} < docker/postgres/seed.sql
+                      else
+                          echo "── BD ya tiene datos ($ROW_COUNT idiomas) — omitiendo seed ──"
+                      fi
 
                       echo "── Esperando a Portfolio (max 60s) ──"
                       if ! timeout 60 bash -c 'until docker compose exec -T portfolio wget -q --spider http://127.0.0.1:4321/ 2>/dev/null; do sleep 5; done'; then
