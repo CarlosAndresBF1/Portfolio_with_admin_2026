@@ -73,7 +73,11 @@ jobs:
       - name: Build admin
         run: pnpm build:admin
         env:
-          DATABASE_URL: postgresql://portfolio_user:ci_test_password@localhost:5432/portfolio_db
+          DB_HOST: localhost
+          POSTGRES_USER: portfolio_user
+          POSTGRES_PASSWORD: ci_test_password
+          POSTGRES_DB: portfolio_db
+          POSTGRES_PORT: "5432"
           NEXTAUTH_SECRET: ci-test-secret-not-for-production
           NEXTAUTH_URL: http://localhost:3000
           INTERNAL_API_KEY: ci-test-key
