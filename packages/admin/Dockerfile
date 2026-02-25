@@ -35,8 +35,16 @@ COPY --from=build /app/.next/standalone ./
 COPY --from=build /app/.next/static ./.next/static
 COPY --from=build /app/public ./public
 
-# Copy Prisma generated client
+# Copy Prisma generated client + schema/migrations (for migrate deploy & seed)
 COPY --from=build /app/src/generated ./src/generated
+COPY --from=build /app/prisma ./prisma
+COPY --from=build /app/prisma.config.ts ./prisma.config.ts
+
+# Install migration tools in separate directory to avoid conflicts with standalone node_modules
+RUN mkdir -p /tools && cd /tools && npm init -y > /dev/null 2>&1 && \
+    npm install prisma dotenv tsx @prisma/adapter-pg > /dev/null 2>&1
+ENV NODE_PATH=/tools/node_modules
+ENV PATH="/tools/node_modules/.bin:$PATH"
 
 ENV NODE_ENV=production
 ENV PORT=3000
@@ -44,7 +52,7 @@ ENV HOSTNAME=0.0.0.0
 
 EXPOSE 3000
 
-RUN chown -R node:node /app
+RUN chown -R node:node /app /tools
 USER node
 
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \

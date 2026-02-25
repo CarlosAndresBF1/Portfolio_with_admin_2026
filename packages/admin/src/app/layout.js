@@ -44,7 +44,7 @@ export default function RootLayout({ children }) {
           <AuthProvider>
             <SettingsProvider
               defaultSettings={{
-                themeMode: 'light',
+                themeMode: 'dark',
                 themeDirection: 'ltr',
                 themeContrast: 'default',
                 themeLayout: 'vertical',

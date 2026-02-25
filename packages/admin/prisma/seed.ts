@@ -9,9 +9,11 @@ import "dotenv/config";
 import path from "path";
 import fs from "fs";
 import bcrypt from "bcryptjs";
-import { PrismaClient } from "../src/generated/prisma";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaClient } from "../src/generated/prisma/client";
 
-const prisma = new PrismaClient();
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
+const prisma = new PrismaClient({ adapter });
 
 // Rutas a los JSON del portfolio (usa los reales si existen, sino los .example)
 const portfolioI18nPath = path.resolve(__dirname, "../../portfolio/src/i18n");

@@ -1,6 +1,6 @@
 {
-  "name": "Minimal UI",
-  "short_name": "Minimal UI",
+  "name": "Portfolio CMS",
+  "short_name": "Portfolio CMS",
   "display": "standalone",
   "start_url": "/",
   "theme_color": "#000000",

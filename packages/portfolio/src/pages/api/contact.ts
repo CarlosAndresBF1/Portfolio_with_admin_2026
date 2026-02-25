@@ -148,10 +148,10 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     );
 
     // Save to DB via Admin API (non-blocking)
-    const adminApiUrl = import.meta.env.ADMIN_API_URL;
-    const apiKey = import.meta.env.INTERNAL_API_KEY;
+    const adminApiUrl = process.env.ADMIN_API_URL;
+    const apiKey = process.env.INTERNAL_API_KEY;
     if (adminApiUrl && apiKey) {
-      fetch(`${adminApiUrl}/api/v1/portfolio/contact`, {
+      fetch(`${adminApiUrl}/api/v1/portfolio/contact/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

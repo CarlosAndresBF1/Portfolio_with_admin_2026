@@ -1,15 +1,18 @@
-import enFallback from './en.example.json';
-import esFallback from './es.example.json';
+import enFallback from "./en.example.json";
+import esFallback from "./es.example.json";
 
-export type Lang = 'en' | 'es';
-export const defaultLang: Lang = 'es';
-export const supportedLangs: Lang[] = ['en', 'es'];
+export type Lang = "en" | "es";
+export const defaultLang: Lang = "es";
+export const supportedLangs: Lang[] = ["en", "es"];
 
-const ADMIN_API_URL = import.meta.env.ADMIN_API_URL;
-const INTERNAL_API_KEY = import.meta.env.INTERNAL_API_KEY;
+const ADMIN_API_URL = process.env.ADMIN_API_URL;
+const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY;
 
 // Cache en memoria con TTL de 60 segundos
-interface CacheEntry { data: unknown; ts: number }
+interface CacheEntry {
+  data: unknown;
+  ts: number;
+}
 const cache = new Map<string, CacheEntry>();
 const CACHE_TTL = 60_000;
 
@@ -30,16 +33,22 @@ export async function getTranslations(lang: Lang): Promise<unknown> {
   }
 
   if (!ADMIN_API_URL || !INTERNAL_API_KEY) {
+    console.warn(
+      `[i18n] Missing env vars — ADMIN_API_URL: ${!!ADMIN_API_URL}, INTERNAL_API_KEY: ${!!INTERNAL_API_KEY}. Using fallback data.`,
+    );
     const fallback = fallbackData[lang];
     cache.set(key, { data: fallback, ts: Date.now() });
     return fallback;
   }
 
   try {
-    const res = await fetch(`${ADMIN_API_URL}/api/v1/portfolio/${lang}`, {
+    // Trailing slash requerido porque Next.js (admin) tiene trailingSlash: true
+    const url = `${ADMIN_API_URL}/api/v1/portfolio/${lang}/`;
+    console.log(`[i18n] Fetching ${url}`);
+    const res = await fetch(url, {
       headers: {
-        'X-API-Key': INTERNAL_API_KEY,
-        'Content-Type': 'application/json',
+        "X-API-Key": INTERNAL_API_KEY,
+        "Content-Type": "application/json",
       },
       signal: AbortSignal.timeout(5000),
     });
@@ -73,15 +82,15 @@ export function useTranslations(lang: Lang): any {
 
 // Helpers sin cambios
 export function getLangFromUrl(url: URL): Lang {
-  const [, lang] = url.pathname.split('/');
-  if (lang === 'en' || lang === 'es') return lang as Lang;
+  const [, lang] = url.pathname.split("/");
+  if (lang === "en" || lang === "es") return lang as Lang;
   return defaultLang;
 }
 
-export function getLocalizedPath(lang: Lang, path: string = ''): string {
-  return `/${lang}${path ? `/${path}` : ''}`;
+export function getLocalizedPath(lang: Lang, path: string = ""): string {
+  return `/${lang}${path ? `/${path}` : ""}`;
 }
 
 export function getAlternateLang(lang: Lang): Lang {
-  return lang === 'en' ? 'es' : 'en';
+  return lang === "en" ? "es" : "en";
 }

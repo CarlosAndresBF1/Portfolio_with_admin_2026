@@ -16,7 +16,7 @@ export async function GET(request, { params }) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { lang } = params;
+  const { lang } = await params;
   if (!SUPPORTED_LANGS.includes(lang)) {
     return Response.json({ error: 'Invalid language' }, { status: 400 });
   }

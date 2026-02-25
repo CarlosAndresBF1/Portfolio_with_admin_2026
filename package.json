@@ -18,6 +18,19 @@
     "db:migrate:deploy": "pnpm --filter admin run prisma:migrate:deploy",
     "db:seed": "pnpm --filter admin run prisma:seed",
     "db:studio": "pnpm --filter admin run prisma:studio",
-    "db:reset": "pnpm --filter admin run prisma:reset"
+    "db:reset": "pnpm --filter admin run prisma:reset",
+    "docker:up": "docker compose up -d",
+    "docker:up:build": "docker compose up --build -d",
+    "docker:down": "docker compose down",
+    "docker:down:volumes": "docker compose down -v",
+    "docker:logs": "docker compose logs -f",
+    "docker:logs:admin": "docker compose logs -f admin",
+    "docker:logs:portfolio": "docker compose logs -f portfolio",
+    "docker:restart": "docker compose restart",
+    "docker:ps": "docker compose ps",
+    "docker:dev": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d",
+    "docker:migrate": "docker compose exec admin npx prisma migrate deploy",
+    "docker:seed": "docker compose exec admin npx tsx prisma/seed.ts",
+    "docker:seed:sql": "docker compose exec -T postgres psql -U ${POSTGRES_USER:-portfolio_user} -d ${POSTGRES_DB:-portfolio_db} < docker/postgres/seed.sql"
   }
 }

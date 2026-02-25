@@ -33,5 +33,8 @@ packages/portfolio/src/i18n/es.json
 .idea/
 .vscode/
 
+# ── SQL seed con datos personales ────────────
+docker/postgres/seed.sql
+
 # ── Plan de trabajo (no versionar) ───────────
 .github/workplan/

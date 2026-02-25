@@ -112,7 +112,7 @@ export default function NotificationItem({ notification }) {
         }}
       >
         {reader(
-          `<p><strong>@Jaydon Frankie</strong> feedback by asking questions or just leave a note of appreciation.</p>`
+          `<p><strong>@Admin</strong> feedback by asking questions or just leave a note of appreciation.</p>`
         )}
       </Box>
 
