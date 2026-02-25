@@ -1,0 +1,119 @@
+name: Deploy to VPS
+
+on:
+    push:
+        branches: [main]
+    workflow_dispatch: # permitir deploy manual desde GitHub
+
+env:
+    DEPLOY_PATH: /var/www/CarlosAndresBF_Portfolio
+
+jobs:
+    test:
+        name: Tests
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: pnpm/action-setup@v4
+              with:
+                  version: latest
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+                  cache: pnpm
+
+            - run: pnpm install --frozen-lockfile
+            - run: pnpm --filter portfolio run test
+            - run: pnpm --filter admin run test
+
+    deploy:
+        name: Deploy
+        runs-on: ubuntu-latest
+        needs: test
+        if: github.ref == 'refs/heads/main'
+
+        steps:
+            - uses: actions/checkout@v4
+
+            # ── Generar .env en el runner a partir de GitHub Secrets ──────────────
+            - name: Generate .env from secrets
+              run: |
+                  cat > .env << 'ENVEOF'
+                  # Database
+                  POSTGRES_DB=${{ secrets.POSTGRES_DB }}
+                  POSTGRES_USER=${{ secrets.POSTGRES_USER }}
+                  POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+                  POSTGRES_PORT=5432
+                  DATABASE_URL=postgresql://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@postgres:5432/${{ secrets.POSTGRES_DB }}
+
+                  # Admin
+                  ADMIN_PORT=${{ secrets.ADMIN_PORT }}
+                  ADMIN_BASE_URL=${{ secrets.ADMIN_BASE_URL }}
+                  NEXTAUTH_URL=${{ secrets.ADMIN_BASE_URL }}
+                  NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}
+                  ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL }}
+                  ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}
+
+                  # Portfolio
+                  PORTFOLIO_PORT=${{ secrets.PORTFOLIO_PORT }}
+                  PORTFOLIO_BASE_URL=${{ secrets.PORTFOLIO_BASE_URL }}
+                  PORTFOLIO_URL=${{ secrets.PORTFOLIO_BASE_URL }}
+                  PUBLIC_GTM_ID=${{ secrets.PUBLIC_GTM_ID }}
+
+                  # Internal
+                  ADMIN_API_URL=http://admin:3000
+                  INTERNAL_API_KEY=${{ secrets.INTERNAL_API_KEY }}
+
+                  # SMTP
+                  SMTP_HOST=${{ secrets.SMTP_HOST }}
+                  SMTP_PORT=${{ secrets.SMTP_PORT }}
+                  SMTP_SECURE=${{ secrets.SMTP_SECURE }}
+                  SMTP_USER=${{ secrets.SMTP_USER }}
+                  SMTP_PASS=${{ secrets.SMTP_PASS }}
+                  CONTACT_TO_EMAIL=${{ secrets.CONTACT_TO_EMAIL }}
+                  ENVEOF
+                  # Limpiar espacios en blanco al inicio de cada línea
+                  sed -i 's/^          //' .env
+
+            # ── Copiar proyecto al VPS ───────────────────────────────────────────
+            - name: Copy files to VPS
+              uses: appleboy/scp-action@v0.1.7
+              with:
+                  host: ${{ secrets.VPS_HOST }}
+                  username: ${{ secrets.VPS_USER }}
+                  key: ${{ secrets.VPS_SSH_KEY }}
+                  port: ${{ secrets.VPS_SSH_PORT || 22 }}
+                  source: ".,!node_modules,!.git,!packages/*/node_modules,!packages/*/.next,!packages/*/dist"
+                  target: ${{ env.DEPLOY_PATH }}
+                  overwrite: true
+
+            # ── Build & deploy en el VPS ─────────────────────────────────────────
+            - name: Deploy on VPS
+              uses: appleboy/ssh-action@v1.0.3
+              with:
+                  host: ${{ secrets.VPS_HOST }}
+                  username: ${{ secrets.VPS_USER }}
+                  key: ${{ secrets.VPS_SSH_KEY }}
+                  port: ${{ secrets.VPS_SSH_PORT || 22 }}
+                  script: |
+                      cd ${{ env.DEPLOY_PATH }}
+
+                      # Build y levantar contenedores
+                      docker compose down
+                      docker compose up --build -d
+
+                      # Esperar a que postgres esté healthy
+                      echo "Esperando a PostgreSQL..."
+                      timeout 60 bash -c 'until docker compose exec -T postgres pg_isready -U ${{ secrets.POSTGRES_USER }} -d ${{ secrets.POSTGRES_DB }}; do sleep 2; done'
+
+                      # Ejecutar migraciones de Prisma
+                      docker compose exec -T admin npx prisma migrate deploy
+
+                      # Seed inicial (solo si es la primera vez o se quiere forzar)
+                      # docker compose exec -T postgres psql -U ${{ secrets.POSTGRES_USER }} -d ${{ secrets.POSTGRES_DB }} < docker/postgres/seed.sql
+
+                      # Verificar que los servicios estén corriendo
+                      docker compose ps
+                      echo "✅ Deploy completado"
