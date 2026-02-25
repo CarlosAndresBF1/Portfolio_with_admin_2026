@@ -153,7 +153,7 @@ jobs:
                       echo "✓ Admin listo"
 
                       echo "── Sincronizando schema de la BD ──"
-                      docker compose exec -T admin npx tsx scripts/sync-schema.ts
+                      docker compose exec -T admin tsx scripts/sync-schema.ts
 
                       echo "── Ejecutando seed (idempotente — borra y reinserta) ──"
                       docker compose exec -T postgres psql -U ${{ secrets.POSTGRES_USER }} -d ${{ secrets.POSTGRES_DB }} < docker/postgres/seed.sql

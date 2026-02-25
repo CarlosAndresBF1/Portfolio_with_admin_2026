@@ -33,8 +33,10 @@ COPY --from=build /app/scripts ./scripts
 COPY --from=build /app/src/entities ./src/entities
 COPY --from=build /app/src/lib/db.js ./src/lib/db.js
 
-# Install migration/seed tools (must be in /app so tsx resolves them)
-RUN npm install --no-save typeorm pg dotenv tsx bcryptjs > /dev/null 2>&1
+# Install migration/seed tools in a sibling dir (standalone pkg.json is read-only)
+RUN mkdir -p /tools && cd /tools && npm init -y && npm install typeorm pg dotenv tsx bcryptjs
+ENV NODE_PATH=/tools/node_modules
+ENV PATH="/tools/node_modules/.bin:$PATH"
 
 ENV NODE_ENV=production
 ENV PORT=3000
@@ -42,7 +44,7 @@ ENV HOSTNAME=0.0.0.0
 
 EXPOSE 3000
 
-RUN chown -R node:node /app
+RUN chown -R node:node /app /tools
 USER node
 
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \

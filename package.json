@@ -25,7 +25,7 @@
     "docker:restart": "docker compose restart",
     "docker:ps": "docker compose ps",
     "docker:dev": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d",
-    "docker:sync-schema": "docker compose exec -T admin npx tsx scripts/sync-schema.ts",
+    "docker:sync-schema": "docker compose exec -T admin tsx scripts/sync-schema.ts",
     "docker:seed": "docker compose exec -T postgres psql -U ${POSTGRES_USER:-portfolio_user} -d ${POSTGRES_DB:-portfolio_db} < docker/postgres/seed.sql"
   }
 }
