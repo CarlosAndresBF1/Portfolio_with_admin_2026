@@ -1,13 +1,8 @@
-import { getToken } from 'next-auth/jwt';
+import { auth } from 'src/lib/auth';
 import { NextResponse } from 'next/server';
 
-export async function proxy(request) {
-  const token = await getToken({
-    req: request,
-    secret: process.env.NEXTAUTH_SECRET,
-  });
-
-  const isLoggedIn = !!token;
+export const proxy = auth((request) => {
+  const isLoggedIn = !!request.auth;
   const isOnDashboard = request.nextUrl.pathname.startsWith('/dashboard');
 
   if (isOnDashboard && !isLoggedIn) {
@@ -17,7 +12,7 @@ export async function proxy(request) {
   }
 
   return NextResponse.next();
-}
+});
 
 export const config = {
   matcher: ['/dashboard/:path*'],
