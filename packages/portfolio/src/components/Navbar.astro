@@ -32,27 +32,36 @@ const altLang = getAlternateLang(lang);
         </svg>
       </a>
       <ul class="navbar-nav d-flex flex-row justify-content-center mb-lg-0">
-        {(t.socialLinks || []).map((link: { platform: string; label: string; url: string; icon: string }) => (
-          <li class="nav-item ml-1">
-            <a
-              class="nav-link me-2"
-              href={link.url}
-              target={link.platform === 'email' ? undefined : '_blank'}
-              rel={link.platform === 'email' ? undefined : 'noopener'}
-              title={link.label}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                fill="#FFFFFF"
-                viewBox="0 0 256 256"
-              >
-                <path d={link.icon}></path>
-              </svg>
-            </a>
-          </li>
-        ))}
+        {
+          (t.socialLinks || []).map(
+            (link: {
+              platform: string;
+              label: string;
+              url: string;
+              icon: string;
+            }) => (
+              <li class="nav-item ml-1">
+                <a
+                  class="nav-link me-2"
+                  href={link.url}
+                  target={link.platform === "email" ? undefined : "_blank"}
+                  rel={link.platform === "email" ? undefined : "noopener"}
+                  title={link.label}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    fill="#FFFFFF"
+                    viewBox="0 0 256 256"
+                  >
+                    <path d={link.icon} />
+                  </svg>
+                </a>
+              </li>
+            ),
+          )
+        }
         <li class="nav-item ml-1">
           <a
             class="nav-link lang-switch"

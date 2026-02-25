@@ -91,7 +91,10 @@ const keywords =
           addressCountry: "CO",
         },
         sameAs: (t.socialLinks || [])
-          .filter((l: { platform: string; url: string }) => l.platform !== 'email' && l.platform !== 'whatsapp')
+          .filter(
+            (l: { platform: string; url: string }) =>
+              l.platform !== "email" && l.platform !== "whatsapp",
+          )
           .map((l: { url: string }) => l.url),
         knowsAbout: [
           "PHP",
