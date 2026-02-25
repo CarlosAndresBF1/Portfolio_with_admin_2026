@@ -4,8 +4,9 @@ import { EntitySchema } from 'typeorm';
 
 export const Language = new EntitySchema({
   name: 'Language',
+  tableName: 'Language',
   columns: {
-    id: { type: 'text', primary: true, generated: 'uuid' },
+    id: { type: 'text', primary: true, default: () => "gen_random_uuid()" },
     code: { type: 'text', unique: true },
     name: { type: 'text' },
   },
@@ -49,8 +50,9 @@ export const Language = new EntitySchema({
 
 export const PersonalInfo = new EntitySchema({
   name: 'PersonalInfo',
+  tableName: 'PersonalInfo',
   columns: {
-    id: { type: 'text', primary: true, generated: 'uuid' },
+    id: { type: 'text', primary: true, default: () => "gen_random_uuid()" },
     languageId: { type: 'text', unique: true },
     name: { type: 'text' },
     lastName: { type: 'text' },
@@ -73,8 +75,9 @@ export const PersonalInfo = new EntitySchema({
 
 export const MetaSeo = new EntitySchema({
   name: 'MetaSeo',
+  tableName: 'MetaSeo',
   columns: {
-    id: { type: 'text', primary: true, generated: 'uuid' },
+    id: { type: 'text', primary: true, default: () => "gen_random_uuid()" },
     languageId: { type: 'text', unique: true },
     title: { type: 'text' },
     description: { type: 'text' },
@@ -94,8 +97,9 @@ export const MetaSeo = new EntitySchema({
 
 export const NavLabel = new EntitySchema({
   name: 'NavLabel',
+  tableName: 'NavLabel',
   columns: {
-    id: { type: 'text', primary: true, generated: 'uuid' },
+    id: { type: 'text', primary: true, default: () => "gen_random_uuid()" },
     languageId: { type: 'text', unique: true },
     home: { type: 'text' },
     about: { type: 'text' },
@@ -119,8 +123,9 @@ export const NavLabel = new EntitySchema({
 
 export const AboutSection = new EntitySchema({
   name: 'AboutSection',
+  tableName: 'AboutSection',
   columns: {
-    id: { type: 'text', primary: true, generated: 'uuid' },
+    id: { type: 'text', primary: true, default: () => "gen_random_uuid()" },
     languageId: { type: 'text', unique: true },
     title: { type: 'text' },
     subtitle: { type: 'text' },
@@ -147,8 +152,9 @@ export const AboutSection = new EntitySchema({
 
 export const AboutCircleItem = new EntitySchema({
   name: 'AboutCircleItem',
+  tableName: 'AboutCircleItem',
   columns: {
-    id: { type: 'text', primary: true, generated: 'uuid' },
+    id: { type: 'text', primary: true, default: () => "gen_random_uuid()" },
     aboutSectionId: { type: 'text' },
     label: { type: 'text' },
     order: { type: 'int' },
@@ -168,8 +174,9 @@ export const AboutCircleItem = new EntitySchema({
 
 export const SummaryCard = new EntitySchema({
   name: 'SummaryCard',
+  tableName: 'SummaryCard',
   columns: {
-    id: { type: 'text', primary: true, generated: 'uuid' },
+    id: { type: 'text', primary: true, default: () => "gen_random_uuid()" },
     languageId: { type: 'text' },
     order: { type: 'int' },
     title: { type: 'text' },
@@ -191,8 +198,9 @@ export const SummaryCard = new EntitySchema({
 
 export const ExperienceJob = new EntitySchema({
   name: 'ExperienceJob',
+  tableName: 'ExperienceJob',
   columns: {
-    id: { type: 'text', primary: true, generated: 'uuid' },
+    id: { type: 'text', primary: true, default: () => "gen_random_uuid()" },
     number: { type: 'text' },
     company: { type: 'text' },
     periodStart: { type: 'text' },
@@ -217,8 +225,9 @@ export const ExperienceJob = new EntitySchema({
 
 export const ExperienceTranslation = new EntitySchema({
   name: 'ExperienceTranslation',
+  tableName: 'ExperienceTranslation',
   columns: {
-    id: { type: 'text', primary: true, generated: 'uuid' },
+    id: { type: 'text', primary: true, default: () => "gen_random_uuid()" },
     jobId: { type: 'text' },
     languageId: { type: 'text' },
     role: { type: 'text' },
@@ -245,8 +254,9 @@ export const ExperienceTranslation = new EntitySchema({
 
 export const ExperienceStack = new EntitySchema({
   name: 'ExperienceStack',
+  tableName: 'ExperienceStack',
   columns: {
-    id: { type: 'text', primary: true, generated: 'uuid' },
+    id: { type: 'text', primary: true, default: () => "gen_random_uuid()" },
     jobId: { type: 'text' },
     tech: { type: 'text' },
     order: { type: 'int', default: 0 },
@@ -266,8 +276,9 @@ export const ExperienceStack = new EntitySchema({
 
 export const SkillCategory = new EntitySchema({
   name: 'SkillCategory',
+  tableName: 'SkillCategory',
   columns: {
-    id: { type: 'text', primary: true, generated: 'uuid' },
+    id: { type: 'text', primary: true, default: () => "gen_random_uuid()" },
     order: { type: 'int' },
     createdAt: { type: 'timestamp', precision: 3, createDate: true },
   },
@@ -287,8 +298,9 @@ export const SkillCategory = new EntitySchema({
 
 export const SkillCategoryTranslation = new EntitySchema({
   name: 'SkillCategoryTranslation',
+  tableName: 'SkillCategoryTranslation',
   columns: {
-    id: { type: 'text', primary: true, generated: 'uuid' },
+    id: { type: 'text', primary: true, default: () => "gen_random_uuid()" },
     categoryId: { type: 'text' },
     languageId: { type: 'text' },
     name: { type: 'text' },
@@ -313,8 +325,9 @@ export const SkillCategoryTranslation = new EntitySchema({
 
 export const Skill = new EntitySchema({
   name: 'Skill',
+  tableName: 'Skill',
   columns: {
-    id: { type: 'text', primary: true, generated: 'uuid' },
+    id: { type: 'text', primary: true, default: () => "gen_random_uuid()" },
     categoryId: { type: 'text' },
     order: { type: 'int' },
     years: { type: 'text' },
@@ -343,8 +356,9 @@ export const Skill = new EntitySchema({
 
 export const SkillTranslation = new EntitySchema({
   name: 'SkillTranslation',
+  tableName: 'SkillTranslation',
   columns: {
-    id: { type: 'text', primary: true, generated: 'uuid' },
+    id: { type: 'text', primary: true, default: () => "gen_random_uuid()" },
     skillId: { type: 'text' },
     languageId: { type: 'text' },
     name: { type: 'text' },
@@ -370,8 +384,9 @@ export const SkillTranslation = new EntitySchema({
 
 export const SkillWorkplace = new EntitySchema({
   name: 'SkillWorkplace',
+  tableName: 'SkillWorkplace',
   columns: {
-    id: { type: 'text', primary: true, generated: 'uuid' },
+    id: { type: 'text', primary: true, default: () => "gen_random_uuid()" },
     skillId: { type: 'text' },
     workplace: { type: 'text' },
     order: { type: 'int', default: 0 },
@@ -391,8 +406,9 @@ export const SkillWorkplace = new EntitySchema({
 
 export const MarqueeItem = new EntitySchema({
   name: 'MarqueeItem',
+  tableName: 'MarqueeItem',
   columns: {
-    id: { type: 'text', primary: true, generated: 'uuid' },
+    id: { type: 'text', primary: true, default: () => "gen_random_uuid()" },
     languageId: { type: 'text' },
     text: { type: 'text' },
     order: { type: 'int' },
@@ -411,8 +427,9 @@ export const MarqueeItem = new EntitySchema({
 
 export const Project = new EntitySchema({
   name: 'Project',
+  tableName: 'Project',
   columns: {
-    id: { type: 'text', primary: true, generated: 'uuid' },
+    id: { type: 'text', primary: true, default: () => "gen_random_uuid()" },
     order: { type: 'int' },
     createdAt: { type: 'timestamp', precision: 3, createDate: true },
     updatedAt: { type: 'timestamp', precision: 3, updateDate: true },
@@ -433,8 +450,9 @@ export const Project = new EntitySchema({
 
 export const ProjectTranslation = new EntitySchema({
   name: 'ProjectTranslation',
+  tableName: 'ProjectTranslation',
   columns: {
-    id: { type: 'text', primary: true, generated: 'uuid' },
+    id: { type: 'text', primary: true, default: () => "gen_random_uuid()" },
     projectId: { type: 'text' },
     languageId: { type: 'text' },
     title: { type: 'text' },
@@ -460,8 +478,9 @@ export const ProjectTranslation = new EntitySchema({
 
 export const ProjectStack = new EntitySchema({
   name: 'ProjectStack',
+  tableName: 'ProjectStack',
   columns: {
-    id: { type: 'text', primary: true, generated: 'uuid' },
+    id: { type: 'text', primary: true, default: () => "gen_random_uuid()" },
     projectId: { type: 'text' },
     tech: { type: 'text' },
     order: { type: 'int', default: 0 },
@@ -481,8 +500,9 @@ export const ProjectStack = new EntitySchema({
 
 export const ContactSectionTranslation = new EntitySchema({
   name: 'ContactSectionTranslation',
+  tableName: 'ContactSectionTranslation',
   columns: {
-    id: { type: 'text', primary: true, generated: 'uuid' },
+    id: { type: 'text', primary: true, default: () => "gen_random_uuid()" },
     languageId: { type: 'text', unique: true },
     title: { type: 'text' },
     titleHighlight: { type: 'text' },
@@ -511,8 +531,9 @@ export const ContactSectionTranslation = new EntitySchema({
 
 export const FooterTranslation = new EntitySchema({
   name: 'FooterTranslation',
+  tableName: 'FooterTranslation',
   columns: {
-    id: { type: 'text', primary: true, generated: 'uuid' },
+    id: { type: 'text', primary: true, default: () => "gen_random_uuid()" },
     languageId: { type: 'text', unique: true },
     name: { type: 'text' },
     email: { type: 'text' },
@@ -532,8 +553,9 @@ export const FooterTranslation = new EntitySchema({
 
 export const ContactSubmission = new EntitySchema({
   name: 'ContactSubmission',
+  tableName: 'ContactSubmission',
   columns: {
-    id: { type: 'text', primary: true, generated: 'uuid' },
+    id: { type: 'text', primary: true, default: () => "gen_random_uuid()" },
     name: { type: 'text' },
     email: { type: 'text' },
     subject: { type: 'text' },
@@ -548,8 +570,9 @@ export const ContactSubmission = new EntitySchema({
 
 export const User = new EntitySchema({
   name: 'User',
+  tableName: 'User',
   columns: {
-    id: { type: 'text', primary: true, generated: 'uuid' },
+    id: { type: 'text', primary: true, default: () => "gen_random_uuid()" },
     name: { type: 'text', nullable: true },
     email: { type: 'text', nullable: true, unique: true },
     emailVerified: { type: 'timestamp', precision: 3, nullable: true },
@@ -572,8 +595,9 @@ export const User = new EntitySchema({
 
 export const Account = new EntitySchema({
   name: 'Account',
+  tableName: 'Account',
   columns: {
-    id: { type: 'text', primary: true, generated: 'uuid' },
+    id: { type: 'text', primary: true, default: () => "gen_random_uuid()" },
     userId: { type: 'text' },
     type: { type: 'text' },
     provider: { type: 'text' },
@@ -600,8 +624,9 @@ export const Account = new EntitySchema({
 
 export const Session = new EntitySchema({
   name: 'Session',
+  tableName: 'Session',
   columns: {
-    id: { type: 'text', primary: true, generated: 'uuid' },
+    id: { type: 'text', primary: true, default: () => "gen_random_uuid()" },
     sessionToken: { type: 'text', unique: true },
     userId: { type: 'text' },
     expires: { type: 'timestamp', precision: 3 },
@@ -619,6 +644,7 @@ export const Session = new EntitySchema({
 
 export const VerificationToken = new EntitySchema({
   name: 'VerificationToken',
+  tableName: 'VerificationToken',
   columns: {
     identifier: { type: 'text', primary: true },
     token: { type: 'text', primary: true },
