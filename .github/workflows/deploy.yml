@@ -128,8 +128,11 @@ jobs:
                       echo "── Deteniendo contenedores anteriores ──"
                       docker compose down --remove-orphans || true
 
-                      echo "── Construyendo y levantando contenedores ──"
-                      docker compose up --build -d
+                      echo "── Limpiando imágenes antiguas (evitar cache de Dockerfiles obsoletos) ──"
+                      docker compose build --no-cache
+
+                      echo "── Levantando contenedores ──"
+                      docker compose up -d
 
                       echo "── Estado inmediato ──"
                       docker compose ps -a
