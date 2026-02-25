@@ -11,7 +11,7 @@ export const dynamic = 'force-dynamic';
 export default async function Page({ params }) {
   const { id } = await params;
   const db = await getDB();
-  const [skill, categories] = await Promise.all([
+  const [skill, categories, jobs] = await Promise.all([
     db.getRepository('Skill').findOne({
       where: { id },
       relations: { translations: { language: true }, workplaces: true, category: true },
@@ -20,10 +20,14 @@ export default async function Page({ params }) {
       order: { order: 'ASC' },
       relations: { translations: { language: true } },
     }),
+    db.getRepository('ExperienceJob').find({
+      order: { order: 'ASC' },
+      select: ['id', 'company'],
+    }),
   ]);
 
   if (!skill) notFound();
   skill.workplaces.sort((a, b) => a.order - b.order);
 
-  return <SkillFormView skill={skill} categories={categories} />;
+  return <SkillFormView skill={skill} categories={categories} jobs={jobs} />;
 }

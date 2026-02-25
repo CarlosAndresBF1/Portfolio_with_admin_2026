@@ -62,7 +62,7 @@ export default function SkillsView({ categories }) {
                         <TableCell>
                           <Stack direction="row" flexWrap="wrap" gap={0.5}>
                             {skill.workplaces.slice(0, 3).map((w) => (
-                              <Chip key={w.id} label={w.workplace} size="small" />
+                              <Chip key={w.id} label={w.job?.company || '?'} size="small" />
                             ))}
                             {skill.workplaces.length > 3 && (
                               <Chip

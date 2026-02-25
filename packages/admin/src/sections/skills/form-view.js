@@ -10,11 +10,14 @@ import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Select from '@mui/material/Select';
+import Checkbox from '@mui/material/Checkbox';
 import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
 import InputLabel from '@mui/material/InputLabel';
 import Typography from '@mui/material/Typography';
 import FormControl from '@mui/material/FormControl';
+import ListItemText from '@mui/material/ListItemText';
+import OutlinedInput from '@mui/material/OutlinedInput';
 
 import { paths } from 'src/routes/paths';
 import { RouterLink } from 'src/routes/components';
@@ -23,58 +26,53 @@ import Iconify from 'src/components/iconify';
 
 import { saveSkill } from './actions';
 
-// ─── Workplace chips input ────────────────────────────────────────────────────
+// ─── Workplace multi-select (from ExperienceJob) ─────────────────────────────
 
-function WorkplacesInput({ defaultValue }) {
-  const [items, setItems] = useState(defaultValue || []);
-  const [input, setInput] = useState('');
-
-  const add = () => {
-    const trimmed = input.trim();
-    if (trimmed && !items.includes(trimmed)) {
-      setItems((prev) => [...prev, trimmed]);
-    }
-    setInput('');
-  };
-
-  const remove = (workplace) => setItems((prev) => prev.filter((w) => w !== workplace));
+function WorkplacesSelect({ jobs, defaultValue }) {
+  const [selected, setSelected] = useState(defaultValue || []);
 
   return (
     <Box>
-      <input type="hidden" name="workplaces" value={items.join(',')} />
-      <Stack direction="row" flexWrap="wrap" gap={0.5} sx={{ mb: 1 }}>
-        {items.map((workplace) => (
-          <Chip
-            key={workplace}
-            label={workplace}
-            onDelete={() => remove(workplace)}
-            size="small"
-          />
-        ))}
-        {items.length === 0 && (
-          <Typography variant="caption" color="text.disabled">
-            Sin lugares de trabajo agregados
-          </Typography>
-        )}
-      </Stack>
-      <Stack direction="row" spacing={1}>
-        <TextField
-          size="small"
-          placeholder="Agregar lugar de trabajo..."
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), add())}
-          sx={{ flex: 1 }}
-        />
-        <Button variant="outlined" size="small" onClick={add}>
-          Agregar
-        </Button>
+      <input type="hidden" name="jobIds" value={selected.join(',')} />
+      <FormControl fullWidth>
+        <InputLabel>Empresas (de Experiencia)</InputLabel>
+        <Select
+          multiple
+          value={selected}
+          onChange={(e) => setSelected(e.target.value)}
+          input={<OutlinedInput label="Empresas (de Experiencia)" />}
+          renderValue={(ids) =>
+            ids
+              .map((id) => jobs.find((j) => j.id === id)?.company || id)
+              .join(', ')
+          }
+        >
+          {jobs.map((job) => (
+            <MenuItem key={job.id} value={job.id}>
+              <Checkbox checked={selected.includes(job.id)} />
+              <ListItemText primary={job.company} />
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      <Stack direction="row" flexWrap="wrap" gap={0.5} sx={{ mt: 1 }}>
+        {selected.map((id) => {
+          const job = jobs.find((j) => j.id === id);
+          return (
+            <Chip
+              key={id}
+              label={job?.company || id}
+              onDelete={() => setSelected((prev) => prev.filter((v) => v !== id))}
+              size="small"
+            />
+          );
+        })}
       </Stack>
     </Box>
   );
 }
 
-WorkplacesInput.propTypes = { defaultValue: PropTypes.array };
+WorkplacesSelect.propTypes = { jobs: PropTypes.array, defaultValue: PropTypes.array };
 
 // ─── Translation fields ───────────────────────────────────────────────────────
 
@@ -108,7 +106,7 @@ TranslationFields.propTypes = {
 
 // ─── Main form ────────────────────────────────────────────────────────────────
 
-export default function SkillFormView({ skill, categories }) {
+export default function SkillFormView({ skill, categories, jobs }) {
   const [langTab, setLangTab] = useState(0);
 
   const esTranslation = skill?.translations?.find((t) => t.language?.code === 'es');
@@ -173,8 +171,9 @@ export default function SkillFormView({ skill, categories }) {
             <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>
               Lugares de trabajo
             </Typography>
-            <WorkplacesInput
-              defaultValue={skill?.workplaces?.map((w) => w.workplace)}
+            <WorkplacesSelect
+              jobs={jobs}
+              defaultValue={skill?.workplaces?.map((w) => w.jobId)}
             />
           </Box>
 
@@ -220,4 +219,5 @@ export default function SkillFormView({ skill, categories }) {
 SkillFormView.propTypes = {
   skill: PropTypes.object,
   categories: PropTypes.array,
+  jobs: PropTypes.array,
 };

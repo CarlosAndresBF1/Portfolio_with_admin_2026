@@ -25,8 +25,8 @@ export async function saveSkill(formData) {
   const enName = formData.get('en_name') || '';
   const enDescription = formData.get('en_description') || '';
 
-  const workplacesStr = formData.get('workplaces') || '';
-  const workplaceItems = workplacesStr
+  const jobIdsStr = formData.get('jobIds') || '';
+  const jobIds = jobIdsStr
     .split(',')
     .map((w) => w.trim())
     .filter(Boolean);
@@ -54,13 +54,13 @@ export async function saveSkill(formData) {
       ),
     ]);
 
-    // Replace workplaces
+    // Replace workplaces (now FK to ExperienceJob)
     await wpRepo.delete({ skillId: id });
-    if (workplaceItems.length > 0) {
+    if (jobIds.length > 0) {
       await wpRepo.save(
-        workplaceItems.map((workplace, idx) => ({
+        jobIds.map((jobId, idx) => ({
           skillId: id,
-          workplace,
+          jobId,
           order: idx,
         }))
       );

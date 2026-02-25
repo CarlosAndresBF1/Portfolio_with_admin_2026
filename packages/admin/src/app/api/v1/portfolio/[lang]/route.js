@@ -77,6 +77,7 @@ export async function GET(request, { params }) {
           langId: language.id,
         })
         .leftJoinAndSelect('skill.workplaces', 'sw')
+        .leftJoinAndSelect('sw.job', 'swJob')
         .orderBy('cat.order', 'ASC')
         .addOrderBy('skill.order', 'ASC')
         .addOrderBy('sw.order', 'ASC')
@@ -165,7 +166,7 @@ export async function GET(request, { params }) {
               return {
                 name: skillT.name || '',
                 description: skillT.description || '',
-                workplaces: skill.workplaces.map((w) => w.workplace),
+                workplaces: skill.workplaces.map((w) => w.job?.company || ''),
                 years: skill.years,
               };
             }),

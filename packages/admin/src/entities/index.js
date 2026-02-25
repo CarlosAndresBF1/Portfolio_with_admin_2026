@@ -220,6 +220,11 @@ export const ExperienceJob = new EntitySchema({
       target: 'ExperienceStack',
       inverseSide: 'job',
     },
+    skillWorkplaces: {
+      type: 'one-to-many',
+      target: 'SkillWorkplace',
+      inverseSide: 'job',
+    },
   },
 });
 
@@ -388,7 +393,7 @@ export const SkillWorkplace = new EntitySchema({
   columns: {
     id: { type: 'text', primary: true, default: () => "gen_random_uuid()" },
     skillId: { type: 'text' },
-    workplace: { type: 'text' },
+    jobId: { type: 'text' },
     order: { type: 'int', default: 0 },
   },
   relations: {
@@ -398,6 +403,13 @@ export const SkillWorkplace = new EntitySchema({
       joinColumn: { name: 'skillId' },
       onDelete: 'CASCADE',
       inverseSide: 'workplaces',
+    },
+    job: {
+      type: 'many-to-one',
+      target: 'ExperienceJob',
+      joinColumn: { name: 'jobId' },
+      onDelete: 'CASCADE',
+      inverseSide: 'skillWorkplaces',
     },
   },
 });

@@ -306,34 +306,34 @@ INSERT INTO "SkillTranslation" (id, "skillId", "languageId", name, description) 
   (gen_random_uuid()::text, 'skill-typescript', get_lang_id('en'), 'TypeScript', 'Typed superset of JavaScript used with NestJS and Angular for safer, more maintainable code.'),
   (gen_random_uuid()::text, 'skill-csharp',     get_lang_id('en'), 'C#/.NET', 'Used for ASP.NET development and teaching at SENA INSTITUTE. Enterprise-grade application development.');
 
-INSERT INTO "SkillWorkplace" (id, "skillId", workplace, "order") VALUES
-  (gen_random_uuid()::text, 'skill-php', 'BLOSSOM', 0),
-  (gen_random_uuid()::text, 'skill-php', 'INMOV - AX MARKETING', 1),
-  (gen_random_uuid()::text, 'skill-php', 'SENA INSTITUTE', 2),
-  (gen_random_uuid()::text, 'skill-php', 'IMAGINAMOS SAS', 3),
-  (gen_random_uuid()::text, 'skill-php', 'Mercadeo y Tecnología', 4),
-  (gen_random_uuid()::text, 'skill-php', 'AC Webmasters', 5),
-  (gen_random_uuid()::text, 'skill-php', 'Soluciones Web Colombia', 6),
-  (gen_random_uuid()::text, 'skill-laravel', 'BLOSSOM', 0),
-  (gen_random_uuid()::text, 'skill-laravel', 'INMOV - AX MARKETING', 1),
-  (gen_random_uuid()::text, 'skill-lumen', 'INMOV - AX MARKETING', 0),
-  (gen_random_uuid()::text, 'skill-codeigniter', 'IMAGINAMOS SAS', 0),
-  (gen_random_uuid()::text, 'skill-codeigniter', 'Mercadeo y Tecnología', 1),
-  (gen_random_uuid()::text, 'skill-codeigniter', 'AC Webmasters', 2),
-  (gen_random_uuid()::text, 'skill-codeigniter', 'Soluciones Web Colombia', 3),
-  (gen_random_uuid()::text, 'skill-nestjs', 'INMOV - AX MARKETING', 0),
-  (gen_random_uuid()::text, 'skill-nextjs', 'INMOV - AX MARKETING', 0),
-  (gen_random_uuid()::text, 'skill-angular', 'INMOV - AX MARKETING', 0),
-  (gen_random_uuid()::text, 'skill-react', 'BLOSSOM', 0),
-  (gen_random_uuid()::text, 'skill-react', 'INMOV - AX MARKETING', 1),
-  (gen_random_uuid()::text, 'skill-javascript', 'INMOV - AX MARKETING', 0),
-  (gen_random_uuid()::text, 'skill-javascript', 'SENA INSTITUTE', 1),
-  (gen_random_uuid()::text, 'skill-javascript', 'IMAGINAMOS SAS', 2),
-  (gen_random_uuid()::text, 'skill-javascript', 'Mercadeo y Tecnología', 3),
-  (gen_random_uuid()::text, 'skill-javascript', 'AC Webmasters', 4),
-  (gen_random_uuid()::text, 'skill-javascript', 'Soluciones Web Colombia', 5),
-  (gen_random_uuid()::text, 'skill-typescript', 'INMOV - AX MARKETING', 0),
-  (gen_random_uuid()::text, 'skill-csharp', 'SENA INSTITUTE', 0);
+INSERT INTO "SkillWorkplace" (id, "skillId", "jobId", "order") VALUES
+  (gen_random_uuid()::text, 'skill-php', 'job-02', 0),
+  (gen_random_uuid()::text, 'skill-php', 'job-01', 1),
+  (gen_random_uuid()::text, 'skill-php', 'job-03', 2),
+  (gen_random_uuid()::text, 'skill-php', 'job-04', 3),
+  (gen_random_uuid()::text, 'skill-php', 'job-05', 4),
+  (gen_random_uuid()::text, 'skill-php', 'job-06', 5),
+  (gen_random_uuid()::text, 'skill-php', 'job-07', 6),
+  (gen_random_uuid()::text, 'skill-laravel', 'job-02', 0),
+  (gen_random_uuid()::text, 'skill-laravel', 'job-01', 1),
+  (gen_random_uuid()::text, 'skill-lumen', 'job-01', 0),
+  (gen_random_uuid()::text, 'skill-codeigniter', 'job-04', 0),
+  (gen_random_uuid()::text, 'skill-codeigniter', 'job-05', 1),
+  (gen_random_uuid()::text, 'skill-codeigniter', 'job-06', 2),
+  (gen_random_uuid()::text, 'skill-codeigniter', 'job-07', 3),
+  (gen_random_uuid()::text, 'skill-nestjs', 'job-01', 0),
+  (gen_random_uuid()::text, 'skill-nextjs', 'job-01', 0),
+  (gen_random_uuid()::text, 'skill-angular', 'job-01', 0),
+  (gen_random_uuid()::text, 'skill-react', 'job-02', 0),
+  (gen_random_uuid()::text, 'skill-react', 'job-01', 1),
+  (gen_random_uuid()::text, 'skill-javascript', 'job-01', 0),
+  (gen_random_uuid()::text, 'skill-javascript', 'job-03', 1),
+  (gen_random_uuid()::text, 'skill-javascript', 'job-04', 2),
+  (gen_random_uuid()::text, 'skill-javascript', 'job-05', 3),
+  (gen_random_uuid()::text, 'skill-javascript', 'job-06', 4),
+  (gen_random_uuid()::text, 'skill-javascript', 'job-07', 5),
+  (gen_random_uuid()::text, 'skill-typescript', 'job-01', 0),
+  (gen_random_uuid()::text, 'skill-csharp', 'job-03', 0);
 
 -- Cat 02: Databases (3 skills)
 INSERT INTO "Skill" (id, "categoryId", "order", years, "createdAt") VALUES
@@ -349,16 +349,16 @@ INSERT INTO "SkillTranslation" (id, "skillId", "languageId", name, description) 
   (gen_random_uuid()::text, 'skill-postgresql', get_lang_id('en'), 'PostgreSQL', 'Advanced open-source database used for complex data requirements and scalability.'),
   (gen_random_uuid()::text, 'skill-sqlserver',  get_lang_id('en'), 'SQL Server', 'Microsoft database platform used in enterprise .NET projects.');
 
-INSERT INTO "SkillWorkplace" (id, "skillId", workplace, "order") VALUES
-  (gen_random_uuid()::text, 'skill-mysql', 'BLOSSOM', 0),
-  (gen_random_uuid()::text, 'skill-mysql', 'INMOV - AX MARKETING', 1),
-  (gen_random_uuid()::text, 'skill-mysql', 'SENA INSTITUTE', 2),
-  (gen_random_uuid()::text, 'skill-mysql', 'IMAGINAMOS SAS', 3),
-  (gen_random_uuid()::text, 'skill-mysql', 'Mercadeo y Tecnología', 4),
-  (gen_random_uuid()::text, 'skill-mysql', 'AC Webmasters', 5),
-  (gen_random_uuid()::text, 'skill-mysql', 'Soluciones Web Colombia', 6),
-  (gen_random_uuid()::text, 'skill-postgresql', 'INMOV - AX MARKETING', 0),
-  (gen_random_uuid()::text, 'skill-sqlserver', 'SENA INSTITUTE', 0);
+INSERT INTO "SkillWorkplace" (id, "skillId", "jobId", "order") VALUES
+  (gen_random_uuid()::text, 'skill-mysql', 'job-02', 0),
+  (gen_random_uuid()::text, 'skill-mysql', 'job-01', 1),
+  (gen_random_uuid()::text, 'skill-mysql', 'job-03', 2),
+  (gen_random_uuid()::text, 'skill-mysql', 'job-04', 3),
+  (gen_random_uuid()::text, 'skill-mysql', 'job-05', 4),
+  (gen_random_uuid()::text, 'skill-mysql', 'job-06', 5),
+  (gen_random_uuid()::text, 'skill-mysql', 'job-07', 6),
+  (gen_random_uuid()::text, 'skill-postgresql', 'job-01', 0),
+  (gen_random_uuid()::text, 'skill-sqlserver', 'job-03', 0);
 
 -- Cat 03: DevOps & Tools (7 skills)
 INSERT INTO "Skill" (id, "categoryId", "order", years, "createdAt") VALUES
@@ -386,16 +386,16 @@ INSERT INTO "SkillTranslation" (id, "skillId", "languageId", name, description) 
   (gen_random_uuid()::text, 'skill-jira',       get_lang_id('en'), 'Jira', 'Project management tool used for agile sprint planning and task tracking.'),
   (gen_random_uuid()::text, 'skill-confluence', get_lang_id('en'), 'Confluence', 'Documentation platform used for technical docs and team collaboration.');
 
-INSERT INTO "SkillWorkplace" (id, "skillId", workplace, "order") VALUES
-  (gen_random_uuid()::text, 'skill-git', 'INMOV - AX MARKETING', 0),
-  (gen_random_uuid()::text, 'skill-git', 'IMAGINAMOS SAS', 1),
-  (gen_random_uuid()::text, 'skill-git', 'AC Webmasters', 2),
-  (gen_random_uuid()::text, 'skill-bitbucket', 'INMOV - AX MARKETING', 0),
-  (gen_random_uuid()::text, 'skill-docker', 'INMOV - AX MARKETING', 0),
-  (gen_random_uuid()::text, 'skill-cicd', 'INMOV - AX MARKETING', 0),
-  (gen_random_uuid()::text, 'skill-firebase', 'INMOV - AX MARKETING', 0),
-  (gen_random_uuid()::text, 'skill-jira', 'INMOV - AX MARKETING', 0),
-  (gen_random_uuid()::text, 'skill-confluence', 'INMOV - AX MARKETING', 0);
+INSERT INTO "SkillWorkplace" (id, "skillId", "jobId", "order") VALUES
+  (gen_random_uuid()::text, 'skill-git', 'job-01', 0),
+  (gen_random_uuid()::text, 'skill-git', 'job-04', 1),
+  (gen_random_uuid()::text, 'skill-git', 'job-06', 2),
+  (gen_random_uuid()::text, 'skill-bitbucket', 'job-01', 0),
+  (gen_random_uuid()::text, 'skill-docker', 'job-01', 0),
+  (gen_random_uuid()::text, 'skill-cicd', 'job-01', 0),
+  (gen_random_uuid()::text, 'skill-firebase', 'job-01', 0),
+  (gen_random_uuid()::text, 'skill-jira', 'job-01', 0),
+  (gen_random_uuid()::text, 'skill-confluence', 'job-01', 0);
 
 -- Cat 04: QA & Testing (5 skills)
 INSERT INTO "Skill" (id, "categoryId", "order", years, "createdAt") VALUES
@@ -417,13 +417,13 @@ INSERT INTO "SkillTranslation" (id, "skillId", "languageId", name, description) 
   (gen_random_uuid()::text, 'skill-phpunit',  get_lang_id('en'), 'PHPUnit', 'The standard PHP testing framework for unit testing. Used for writing automated tests ensuring code quality and reliability.'),
   (gen_random_uuid()::text, 'skill-jest',     get_lang_id('en'), 'Jest', 'JavaScript testing framework for unit and integration tests. Used with NestJS and React projects.');
 
-INSERT INTO "SkillWorkplace" (id, "skillId", workplace, "order") VALUES
-  (gen_random_uuid()::text, 'skill-cypress', 'INMOV - AX MARKETING', 0),
-  (gen_random_uuid()::text, 'skill-testrail', 'INMOV - AX MARKETING', 0),
-  (gen_random_uuid()::text, 'skill-pest', 'INMOV - AX MARKETING', 0),
-  (gen_random_uuid()::text, 'skill-phpunit', 'INMOV - AX MARKETING', 0),
-  (gen_random_uuid()::text, 'skill-phpunit', 'IMAGINAMOS SAS', 1),
-  (gen_random_uuid()::text, 'skill-jest', 'INMOV - AX MARKETING', 0);
+INSERT INTO "SkillWorkplace" (id, "skillId", "jobId", "order") VALUES
+  (gen_random_uuid()::text, 'skill-cypress', 'job-01', 0),
+  (gen_random_uuid()::text, 'skill-testrail', 'job-01', 0),
+  (gen_random_uuid()::text, 'skill-pest', 'job-01', 0),
+  (gen_random_uuid()::text, 'skill-phpunit', 'job-01', 0),
+  (gen_random_uuid()::text, 'skill-phpunit', 'job-04', 1),
+  (gen_random_uuid()::text, 'skill-jest', 'job-01', 0);
 
 -- Cat 05: Methodologies (3 skills)
 INSERT INTO "Skill" (id, "categoryId", "order", years, "createdAt") VALUES
@@ -439,14 +439,14 @@ INSERT INTO "SkillTranslation" (id, "skillId", "languageId", name, description) 
   (gen_random_uuid()::text, 'skill-mvc',           get_lang_id('en'), 'MVC', 'Model-View-Controller architecture pattern used across PHP frameworks.'),
   (gen_random_uuid()::text, 'skill-microservices', get_lang_id('en'), 'Microservices', 'Distributed architecture pattern for building scalable, maintainable applications.');
 
-INSERT INTO "SkillWorkplace" (id, "skillId", workplace, "order") VALUES
-  (gen_random_uuid()::text, 'skill-scrum', 'INMOV - AX MARKETING', 0),
-  (gen_random_uuid()::text, 'skill-mvc', 'INMOV - AX MARKETING', 0),
-  (gen_random_uuid()::text, 'skill-mvc', 'IMAGINAMOS SAS', 1),
-  (gen_random_uuid()::text, 'skill-mvc', 'Mercadeo y Tecnología', 2),
-  (gen_random_uuid()::text, 'skill-mvc', 'AC Webmasters', 3),
-  (gen_random_uuid()::text, 'skill-mvc', 'Soluciones Web Colombia', 4),
-  (gen_random_uuid()::text, 'skill-microservices', 'INMOV - AX MARKETING', 0);
+INSERT INTO "SkillWorkplace" (id, "skillId", "jobId", "order") VALUES
+  (gen_random_uuid()::text, 'skill-scrum', 'job-01', 0),
+  (gen_random_uuid()::text, 'skill-mvc', 'job-01', 0),
+  (gen_random_uuid()::text, 'skill-mvc', 'job-04', 1),
+  (gen_random_uuid()::text, 'skill-mvc', 'job-05', 2),
+  (gen_random_uuid()::text, 'skill-mvc', 'job-06', 3),
+  (gen_random_uuid()::text, 'skill-mvc', 'job-07', 4),
+  (gen_random_uuid()::text, 'skill-microservices', 'job-01', 0);
 
 -- 10. Projects
 INSERT INTO "Project" (id, "order", "createdAt", "updatedAt") VALUES

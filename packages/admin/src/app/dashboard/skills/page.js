@@ -11,7 +11,7 @@ export default async function Page() {
     order: { order: 'ASC' },
     relations: {
       translations: { language: true },
-      skills: { translations: { language: true }, workplaces: true },
+      skills: { translations: { language: true }, workplaces: { job: true } },
     },
   });
   categories.forEach((cat) => {
