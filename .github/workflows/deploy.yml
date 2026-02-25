@@ -5,6 +5,11 @@ on:
         branches: [main]
     workflow_dispatch: # permitir deploy manual desde GitHub
 
+# Cancelar deploys anteriores si hay uno nuevo en cola
+concurrency:
+    group: deploy-vps
+    cancel-in-progress: true
+
 env:
     DEPLOY_PATH: /var/www/CarlosAndresBF_Portfolio
 
