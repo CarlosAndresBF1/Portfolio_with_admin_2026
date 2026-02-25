@@ -501,4 +501,15 @@ ON CONFLICT ("languageId") DO UPDATE SET
 -- Limpiar función auxiliar
 DROP FUNCTION IF EXISTS get_lang_id(TEXT);
 
+-- 12. Admin User (password: hash bcrypt de ADMIN_PASSWORD)
+-- Solo inserta si no existe, para no sobreescribir cambios de contraseña
+INSERT INTO "User" (id, name, email, password)
+VALUES (
+  gen_random_uuid()::text,
+  'Admin',
+  'carlosandresbeltran89@gmail.com',
+  '$2b$12$uPTiO9rGIRDfcoTmKbe5DOnmw5F2bD.BSKR8Z8FvurSeAMEDSTl9i'
+)
+ON CONFLICT (email) DO NOTHING;
+
 COMMIT;
