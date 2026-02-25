@@ -57,7 +57,7 @@ export async function runSeed(ds: DataSource) {
     'SocialLink',
   ];
   for (const t of cleanOrder) {
-    await r(t).delete({});
+    await r(t).createQueryBuilder().delete().execute();
   }
 
   // ── 1. Languages ───────────────────────────────────────────────────────────
