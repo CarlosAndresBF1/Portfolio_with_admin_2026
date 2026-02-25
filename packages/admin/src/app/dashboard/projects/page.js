@@ -1,4 +1,5 @@
 import { getDB } from 'src/lib/db';
+
 import ProjectsListView from 'src/sections/projects/list-view';
 
 export const metadata = { title: 'Portfolio CMS: Proyectos' };

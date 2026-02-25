@@ -1,4 +1,5 @@
 import { getDB } from 'src/lib/db';
+
 import SummaryView from 'src/sections/content/summary-view';
 
 export const metadata = { title: 'Portfolio CMS: Summary Cards' };

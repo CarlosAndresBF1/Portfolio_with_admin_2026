@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 
 import { getDB } from 'src/lib/db';
+
 import SkillFormView from 'src/sections/skills/form-view';
 
 export const metadata = { title: 'Portfolio CMS: Editar Skill' };

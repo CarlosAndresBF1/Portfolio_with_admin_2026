@@ -1,4 +1,5 @@
 import { getDB } from 'src/lib/db';
+
 import DashboardOverview from 'src/sections/dashboard/view';
 
 export const metadata = { title: 'Portfolio CMS: Dashboard' };

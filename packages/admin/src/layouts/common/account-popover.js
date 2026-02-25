@@ -23,6 +23,10 @@ const OPTIONS = [
     label: 'Home',
     linkTo: '/',
   },
+  {
+    label: 'Perfil',
+    linkTo: '/dashboard/profile',
+  },
 ];
 
 // ----------------------------------------------------------------------

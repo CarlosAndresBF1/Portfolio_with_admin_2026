@@ -139,7 +139,7 @@ RecentContactsCard.propTypes = {
 // ----------------------------------------------------------------------
 
 export default function DashboardOverview({ stats }) {
-  const { totalContacts, unreadContacts, totalJobs, totalSkills, totalProjects, recentContacts } =
+  const { totalContacts, unreadContacts, totalJobs, totalProjects, recentContacts } =
     stats;
 
   return (

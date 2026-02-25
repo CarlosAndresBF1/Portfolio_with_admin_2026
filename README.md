@@ -7,11 +7,17 @@ Monorepo con un portafolio personal (Astro 5 SSR) y un panel de administración 
 ```
 portfolio-monorepo/
 ├── packages/
-│   ├── portfolio/      # Sitio web público (Astro 5 SSR)
-│   └── admin/          # Panel CMS (Next.js 16 + Prisma + NextAuth)
-├── docker-compose.yml  # Orquestación producción (3 servicios)
-├── docker-compose.dev.yml  # Override: solo PostgreSQL
-└── .github/workflows/ci.yml
+│   ├── portfolio/          # Sitio web público (Astro 5 SSR)
+│   └── admin/              # Panel CMS (Next.js 16 + TypeORM + NextAuth)
+├── docker/
+│   └── postgres/
+│       ├── init.sql        # Schema inicial (DDL)
+│       └── seed.sql        # Datos de ejemplo (DML)
+├── docker-compose.yml      # Orquestación producción (3 servicios)
+├── docker-compose.dev.yml  # Override: solo PostgreSQL para dev local
+└── .github/workflows/
+    ├── ci.yml              # Lint + Test + Build en cada push/PR
+    └── deploy.yml          # Deploy automático a VPS en push a main
 ```
 
 **Tecnologías principales:**
@@ -19,7 +25,7 @@ portfolio-monorepo/
 | Componente | Stack |
 |---|---|
 | Portfolio | Astro 5, TypeScript, Bootstrap 5, Sass, Nodemailer |
-| Admin CMS | Next.js 16, React 19, MUI 5, Prisma 7, NextAuth v5 |
+| Admin CMS | Next.js 16, React 19, MUI 5, TypeORM 0.3, NextAuth v5 |
 | Base de datos | PostgreSQL 16 |
 | Infra | Docker, pnpm workspaces, GitHub Actions |
 
@@ -58,13 +64,16 @@ openssl rand -hex 32  # → INTERNAL_API_KEY
 docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 ```
 
-### 3. Instalar dependencias y preparar BD
+### 3. Instalar dependencias y cargar datos
 
 ```bash
 pnpm install
-pnpm db:generate     # Generar cliente Prisma
-pnpm db:migrate:deploy  # Ejecutar migraciones
-pnpm db:seed         # Crear usuario admin y datos iniciales
+
+# Opción A: Seed via SQL (rápido, datos pre-generados)
+pnpm docker:seed:sql
+
+# Opción B: Seed via TypeORM (lee desde los JSON del portfolio)
+pnpm db:seed
 ```
 
 ### 4. Desarrollo local
@@ -90,35 +99,29 @@ Servicios disponibles:
 
 | Servicio | Puerto | URL |
 |---|---|---|
-| PostgreSQL | `${POSTGRES_PORT}` (5432) | - |
-| Admin CMS | `${ADMIN_PORT}` (3059) | http://localhost:3059 |
+| PostgreSQL | `${POSTGRES_PORT}` (5432) | — |
+| Admin CMS | `${ADMIN_PORT}` (3000) | http://localhost:3000 |
 | Portfolio | `${PORTFOLIO_PORT}` (4321) | http://localhost:4321 |
 
-Después del primer despliegue, ejecutar migraciones y seed:
+Después del primer despliegue, cargar datos iniciales:
 
 ```bash
-docker compose exec admin npx prisma migrate deploy
+# Opción A: Seed via SQL
+docker compose exec -T postgres psql -U portfolio_user -d portfolio_db < docker/postgres/seed.sql
+
+# Opción B: Seed via TypeORM
 docker compose exec admin npx tsx prisma/seed.ts
 ```
 
 ### Comandos Docker útiles
 
 ```bash
-# Ver logs
-docker compose logs -f admin
-docker compose logs -f portfolio
-
-# Reiniciar un servicio
-docker compose restart admin
-
-# Reconstruir imágenes tras cambios
-docker compose up --build -d
-
-# Detener todo
-docker compose down
-
-# Detener y borrar datos (incluyendo BD)
-docker compose down -v
+docker compose logs -f admin        # Ver logs del admin
+docker compose logs -f portfolio    # Ver logs del portfolio
+docker compose restart admin        # Reiniciar un servicio
+docker compose up --build -d        # Reconstruir tras cambios
+docker compose down                 # Detener todo
+docker compose down -v              # Detener y borrar datos (incluida BD)
 ```
 
 ## Scripts disponibles
@@ -130,12 +133,23 @@ docker compose down -v
 | `pnpm dev` | Inicia admin y portfolio en paralelo |
 | `pnpm build` | Construye ambos proyectos |
 | `pnpm test` | Ejecuta tests de portfolio y admin |
-| `pnpm db:generate` | Genera el cliente Prisma |
-| `pnpm db:migrate` | Ejecuta migraciones (dev) |
-| `pnpm db:migrate:deploy` | Ejecuta migraciones (producción) |
-| `pnpm db:seed` | Ejecuta seed (usuario admin + datos iniciales) |
-| `pnpm db:studio` | Abre Prisma Studio |
-| `pnpm db:reset` | Resetea la BD completa |
+| `pnpm db:seed` | Seed via TypeORM (lee JSON del portfolio) |
+| `pnpm docker:seed:sql` | Seed via SQL directo (datos pre-generados) |
+| `pnpm docker:up` | `docker compose up -d` |
+| `pnpm docker:up:build` | `docker compose up --build -d` |
+| `pnpm docker:down` | `docker compose down` |
+| `pnpm docker:logs` | `docker compose logs -f` |
+
+### Admin (`packages/admin`)
+
+| Script | Descripción |
+|---|---|
+| `pnpm dev` | Servidor de desarrollo (puerto 3059) |
+| `pnpm build` | Build de producción |
+| `pnpm lint` | ESLint (errores + warnings) |
+| `pnpm lint:fix` | ESLint con auto-fix |
+| `pnpm test` | Vitest (38 tests) |
+| `pnpm typeorm:seed` | Ejecuta seed.ts con TypeORM |
 
 ## Variables de entorno
 
@@ -143,67 +157,118 @@ Ver `.env.example` para la lista completa. Variables críticas:
 
 | Variable | Descripción | Requerida |
 |---|---|---|
-| `DATABASE_URL` | Conexión PostgreSQL | Si |
-| `NEXTAUTH_SECRET` | Secreto JWT (generar con `openssl rand -hex 32`) | Si |
-| `NEXTAUTH_URL` | URL base del admin | Si |
-| `ADMIN_EMAIL` | Email del usuario admin inicial | Si |
-| `ADMIN_PASSWORD` | Password del admin inicial | Si |
-| `INTERNAL_API_KEY` | Key compartida admin/portfolio (generar con `openssl rand -hex 32`) | Si |
-| `SMTP_HOST/USER/PASS` | Configuración SMTP para formulario de contacto | Si |
-| `CONTACT_TO_EMAIL` | Email destino del formulario de contacto | Si |
+| `DATABASE_URL` | Conexión PostgreSQL | Sí |
+| `NEXTAUTH_SECRET` | Secreto JWT (`openssl rand -hex 32`) | Sí |
+| `NEXTAUTH_URL` | URL base del admin | Sí |
+| `ADMIN_EMAIL` | Email del usuario admin inicial | Sí |
+| `ADMIN_PASSWORD` | Password del admin inicial | Sí |
+| `INTERNAL_API_KEY` | Key compartida admin↔portfolio (`openssl rand -hex 32`) | Sí |
+| `SMTP_HOST/USER/PASS` | Configuración SMTP para formulario de contacto | Sí |
+| `CONTACT_TO_EMAIL` | Email destino del formulario de contacto | Sí |
 
-## API interna
+## Comunicación interna (INTERNAL_API_KEY)
 
-El portfolio consume datos del admin via API REST autenticada con `X-API-Key`:
+El portfolio (Astro) y el admin (Next.js) se comunican a través de una API REST **interna** dentro de la red Docker. No hay API expuesta públicamente a internet.
 
-| Endpoint | Método | Descripción |
-|---|---|---|
-| `/api/v1/portfolio/[lang]` | GET | Todos los datos del portfolio por idioma |
-| `/api/v1/portfolio/contact` | POST | Guardar submission del formulario de contacto |
-| `/api/health` | GET | Health check (usado por Docker) |
+### Flujo de comunicación
 
-## Tests
-
-```bash
-# Todos los tests
-pnpm test
-
-# Solo portfolio (62 tests)
-pnpm --filter portfolio run test
-
-# Solo admin (38 tests)
-pnpm --filter admin run test
-
-# Watch mode
-pnpm --filter portfolio run test:watch
-pnpm --filter admin run test:watch
 ```
+┌─────────────┐    HTTP (red Docker interna)    ┌─────────────┐
+│  Portfolio   │ ──────────────────────────────► │  Admin CMS  │
+│  (Astro)     │  GET /api/v1/portfolio/[lang]   │  (Next.js)  │
+│  puerto 4321 │  POST /api/v1/portfolio/contact │  puerto 3000│
+└─────────────┘    Header: X-API-Key: ***        └──────┬──────┘
+                                                        │
+                                                        ▼
+                                                 ┌─────────────┐
+                                                 │  PostgreSQL  │
+                                                 │  puerto 5432 │
+                                                 └─────────────┘
+```
+
+1. **Portfolio → Admin**: El portfolio hace `fetch()` al admin usando la URL interna de Docker (`http://admin:3000/api/v1/portfolio/es`) con el header `X-API-Key: <INTERNAL_API_KEY>`.
+
+2. **Autenticación**: El admin valida el header `X-API-Key` contra `process.env.INTERNAL_API_KEY`. Si no coincide, responde `401 Unauthorized`.
+
+3. **Red Docker privada**: Ambos contenedores están en la misma red Docker. Las peticiones nunca salen a internet. El puerto del admin puede no estar expuesto externamente.
+
+4. **Sin API pública**: No hay endpoints abiertos sin autenticación. Todo requiere o el `X-API-Key` (para el portfolio) o una sesión JWT válida (para el panel admin).
+
+### Endpoints internos
+
+| Endpoint | Método | Autenticación | Descripción |
+|---|---|---|---|
+| `/api/v1/portfolio/[lang]` | GET | `X-API-Key` | Todos los datos del portfolio por idioma (es/en) |
+| `/api/v1/portfolio/contact` | POST | `X-API-Key` | Guardar submission del formulario de contacto |
+| `/api/health` | GET | Ninguna | Health check (solo Docker) |
 
 ## Estructura de la BD
 
-El schema Prisma define:
+TypeORM define 26 entidades en `packages/admin/src/entities/index.js`:
 
-- **Contenido multiidioma** (ES/EN): PersonalInfo, AboutSection, ExperienceJob, Skill, Project, ContactSection, Footer, NavLabels, MetaSeo, MarqueeItems, SummaryCards
-- **Formulario de contacto**: ContactSubmission (con IP, estado leído/no leído)
-- **Autenticación**: User, Account, Session, VerificationToken (NextAuth)
+**Contenido multiidioma (ES/EN):**
+- `Language` — Idiomas disponibles (es, en)
+- `PersonalInfo` — Nombre, rol, tagline (hero section)
+- `MetaSeo` — Título y descripción SEO por idioma
+- `NavLabel` — Etiquetas de navegación
+- `AboutSection` + `AboutCircleItem` — Sección "Sobre mí"
+- `SummaryCard` — Tarjetas resumen
+- `MarqueeItem` — Textos del marquee en hero
+- `ExperienceJob` + `ExperienceTranslation` + `ExperienceStack` — Experiencia laboral
+- `SkillCategory` + `SkillCategoryTranslation` + `Skill` + `SkillTranslation` + `SkillWorkplace` — Habilidades
+- `Project` + `ProjectTranslation` + `ProjectStack` — Proyectos
+- `ContactSectionTranslation` — Textos del formulario de contacto
+- `FooterTranslation` — Textos del footer
+
+**Formulario de contacto:**
+- `ContactSubmission` — Mensajes recibidos (con IP, estado leído/no leído)
+
+**Autenticación:**
+- `User` — Usuarios admin (email + password hasheado con bcrypt)
+- `Account`, `Session`, `VerificationToken` — Tablas NextAuth (sin uso activo, JWT only)
+
+## Panel Admin
+
+| Ruta | Descripción |
+|---|---|
+| `/dashboard` | Dashboard con estadísticas |
+| `/dashboard/content/personal` | Info personal (hero) |
+| `/dashboard/content/about` | Sección About |
+| `/dashboard/content/summary` | Summary Cards |
+| `/dashboard/content/contact-section` | Textos del formulario de contacto |
+| `/dashboard/experience` | Experiencia laboral (CRUD) |
+| `/dashboard/skills` | Skills (CRUD) |
+| `/dashboard/projects` | Proyectos (CRUD) |
+| `/dashboard/contacts` | Mensajes de contacto recibidos |
+| `/dashboard/profile` | Perfil y cambio de contraseña |
 
 ## Seguridad
 
 - Autenticación JWT con NextAuth v5 en todas las rutas del admin
 - `requireAuth()` en todos los Server Actions
-- API Key para comunicación interna entre servicios
-- Rate limiting en el formulario de contacto (5 req/min por IP)
+- API Key para comunicación interna entre servicios (nunca expuesta al navegador)
+- Rate limiting en formulario de contacto (5 req/min por IP)
 - Sanitización HTML (XSS prevention) en inputs
 - Validación de longitud de campos y formato de email
 - Security headers (X-Frame-Options, X-Content-Type-Options, Referrer-Policy)
 - CORS restringido al dominio del portfolio
 - Contenedores Docker ejecutan como usuario no-root
+- Passwords hasheados con bcrypt (12 rounds)
 - Variables sensibles en `.env` (gitignored)
+
+## Tests
+
+```bash
+pnpm test                              # Todos (100 tests)
+pnpm --filter portfolio run test       # Portfolio (62 tests)
+pnpm --filter admin run test           # Admin (38 tests)
+pnpm --filter portfolio run test:watch # Watch mode
+pnpm --filter admin run test:watch
+```
 
 ## CI/CD
 
 GitHub Actions ejecuta en cada push/PR a `main`:
 
-1. **Lint & Test**: ESLint (admin) + Vitest (portfolio + admin)
-2. **Build**: Prisma generate + migrate + build de ambos proyectos
-3. **Docker Build** (solo en `main`): Construye las imágenes Docker
+1. **CI** (`ci.yml`): Lint (ESLint) → Tests (Vitest) → Build (Next.js + Astro) → Docker Build
+2. **Deploy** (`deploy.yml`): SSH al VPS → `docker compose up --build -d`

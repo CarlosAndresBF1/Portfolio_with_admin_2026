@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 
 import { getDB } from 'src/lib/db';
+
 import ProjectFormView from 'src/sections/projects/form-view';
 
 export const metadata = { title: 'Portfolio CMS: Editar Proyecto' };

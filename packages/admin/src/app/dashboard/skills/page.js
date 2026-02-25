@@ -1,4 +1,5 @@
 import { getDB } from 'src/lib/db';
+
 import SkillsView from 'src/sections/skills/view';
 
 export const metadata = { title: 'Portfolio CMS: Skills' };

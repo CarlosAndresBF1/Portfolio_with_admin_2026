@@ -1,4 +1,5 @@
 import { getDB } from 'src/lib/db';
+
 import ContactSectionView from 'src/sections/content/contact-section-view';
 
 export const metadata = { title: 'Portfolio CMS: Sección Contacto' };

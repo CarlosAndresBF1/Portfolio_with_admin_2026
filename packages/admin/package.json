@@ -13,7 +13,7 @@
     "prettier": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
     "typeorm:migrate": "typeorm migration:run -d src/lib/data-source.js",
     "typeorm:migrate:revert": "typeorm migration:revert -d src/lib/data-source.js",
-    "typeorm:seed": "tsx prisma/seed.ts",
+    "typeorm:seed": "tsx scripts/seed.ts",
     "test": "vitest run",
     "test:watch": "vitest"
   },

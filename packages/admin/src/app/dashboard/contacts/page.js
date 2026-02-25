@@ -1,4 +1,5 @@
 import { getDB } from 'src/lib/db';
+
 import ContactsView from 'src/sections/contacts/view';
 
 export const metadata = { title: 'Portfolio CMS: Contactos' };

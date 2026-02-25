@@ -40,5 +40,7 @@ export const paths = {
     },
     // Contactos recibidos
     contacts: `${ROOTS.DASHBOARD}/contacts`,
+    // Perfil
+    profile: `${ROOTS.DASHBOARD}/profile`,
   },
 };

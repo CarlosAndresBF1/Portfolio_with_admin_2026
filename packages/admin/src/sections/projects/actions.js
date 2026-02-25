@@ -1,10 +1,11 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { revalidatePath } from 'next/cache';
+
+import { paths } from 'src/routes/paths';
 
 import { getDB } from 'src/lib/db';
-import { paths } from 'src/routes/paths';
 import { requireAuth } from 'src/lib/require-auth';
 
 export async function saveProject(formData) {

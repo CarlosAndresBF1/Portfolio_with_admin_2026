@@ -1,4 +1,5 @@
 import { getDB } from 'src/lib/db';
+
 import AboutView from 'src/sections/content/about-view';
 
 export const metadata = { title: 'Portfolio CMS: About' };

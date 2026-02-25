@@ -1,7 +1,7 @@
 'use client';
 
-import PropTypes from 'prop-types';
 import { useState } from 'react';
+import PropTypes from 'prop-types';
 
 import Box from '@mui/material/Box';
 import Tab from '@mui/material/Tab';
@@ -16,6 +16,7 @@ import { paths } from 'src/routes/paths';
 import { RouterLink } from 'src/routes/components';
 
 import Iconify from 'src/components/iconify';
+
 import { saveProject } from './actions';
 
 // ─── Stack chips input ────────────────────────────────────────────────────────

@@ -1,4 +1,5 @@
 import { getDB } from 'src/lib/db';
+
 import PersonalInfoView from 'src/sections/content/personal-view';
 
 export const metadata = { title: 'Portfolio CMS: Información Personal' };

@@ -20,6 +20,7 @@ import { RouterLink } from 'src/routes/components';
 
 import Iconify from 'src/components/iconify';
 import SaveSnackbar from 'src/components/save-snackbar/save-snackbar';
+
 import { deleteProject } from './actions';
 
 export default function ProjectsListView({ projects }) {

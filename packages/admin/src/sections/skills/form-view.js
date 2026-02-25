@@ -1,7 +1,7 @@
 'use client';
 
-import PropTypes from 'prop-types';
 import { useState } from 'react';
+import PropTypes from 'prop-types';
 
 import Box from '@mui/material/Box';
 import Tab from '@mui/material/Tab';
@@ -13,13 +13,14 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
 import InputLabel from '@mui/material/InputLabel';
-import FormControl from '@mui/material/FormControl';
 import Typography from '@mui/material/Typography';
+import FormControl from '@mui/material/FormControl';
 
 import { paths } from 'src/routes/paths';
 import { RouterLink } from 'src/routes/components';
 
 import Iconify from 'src/components/iconify';
+
 import { saveSkill } from './actions';
 
 // ─── Workplace chips input ────────────────────────────────────────────────────
