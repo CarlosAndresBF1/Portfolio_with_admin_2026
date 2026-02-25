@@ -29,10 +29,9 @@ COPY --from=build /app/.next/static ./.next/static
 COPY --from=build /app/public ./public
 
 # Copy seed script + entities (for seed & future migrations)
-COPY --from=build /app/prisma ./prisma
+COPY --from=build /app/scripts ./scripts
 COPY --from=build /app/src/entities ./src/entities
 COPY --from=build /app/src/lib/db.js ./src/lib/db.js
-COPY --from=build /app/src/lib/data-source.js ./src/lib/data-source.js
 
 # Install migration/seed tools
 RUN mkdir -p /tools && cd /tools && npm init -y > /dev/null 2>&1 && \
