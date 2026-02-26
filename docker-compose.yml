@@ -79,8 +79,7 @@ services:
     build:
       context: ./packages/portfolio
       dockerfile: Dockerfile
-      args:
-        PUBLIC_GTM_ID: ${PUBLIC_GTM_ID:-}
+      args:        PUBLIC_GA_ID: ${PUBLIC_GA_ID:-}        PUBLIC_GTM_ID: ${PUBLIC_GTM_ID:-}
     container_name: portfolio-site
     restart: unless-stopped
     ports:

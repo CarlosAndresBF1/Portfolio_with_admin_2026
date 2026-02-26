@@ -11,6 +11,7 @@ const t = useTranslations(lang);
 const altLang = getAlternateLang(lang);
 
 const gtmId = import.meta.env.PUBLIC_GTM_ID || "";
+const gaId = import.meta.env.PUBLIC_GA_ID || "";
 
 const ASSETS_BASE = "/assets";
 const canonicalURL = new URL(
@@ -29,9 +30,28 @@ const keywords =
 <!doctype html>
 <html lang={lang}>
   <head>
-    {/* Google Tag Manager */}
+    {/* Google Analytics 4 (gtag.js) */}
     {
-      gtmId && (
+      gaId && (
+        <>
+          <script
+            async
+            src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+          />
+          <script
+            set:html={`window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${gaId}');`}
+          />
+        </>
+      )
+    }
+    {/* End Google Analytics 4 */}
+
+    {/* Google Tag Manager (alternative to GA4) */}
+    {
+      gtmId && !gaId && (
         <script
           set:html={`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
         new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],

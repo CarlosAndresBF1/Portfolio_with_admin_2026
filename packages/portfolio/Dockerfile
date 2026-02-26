@@ -15,7 +15,9 @@ RUN pnpm install --frozen-lockfile 2>/dev/null || pnpm install
 # Copy source code
 COPY . .
 
-# Accept GTM ID as build argument (PUBLIC_ prefix required by Astro/Vite)
+# Accept Analytics IDs as build arguments (PUBLIC_ prefix required by Astro/Vite)
+ARG PUBLIC_GA_ID=""
+ENV PUBLIC_GA_ID=${PUBLIC_GA_ID}
 ARG PUBLIC_GTM_ID=""
 ENV PUBLIC_GTM_ID=${PUBLIC_GTM_ID}
 

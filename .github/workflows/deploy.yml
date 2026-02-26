@@ -65,6 +65,7 @@ jobs:
                   PORTFOLIO_PORT=${{ secrets.PORTFOLIO_PORT }}
                   PORTFOLIO_BASE_URL=${{ secrets.PORTFOLIO_BASE_URL }}
                   PORTFOLIO_URL=${{ secrets.PORTFOLIO_BASE_URL }}
+                  PUBLIC_GA_ID=${{ secrets.PUBLIC_GA_ID }}
                   PUBLIC_GTM_ID=${{ secrets.PUBLIC_GTM_ID }}
 
                   # Internal
