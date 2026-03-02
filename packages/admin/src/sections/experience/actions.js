@@ -20,7 +20,7 @@ export async function saveExperienceJob(formData) {
   const company = formData.get('company');
   const number = formData.get('number');
   const periodStart = formData.get('periodStart');
-  const periodEnd = formData.get('periodEnd');
+  const periodEnd = formData.get('periodEnd') || null;
   const order = parseInt(formData.get('order') || '0', 10);
 
   // Traducciones

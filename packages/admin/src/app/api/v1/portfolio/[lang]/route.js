@@ -148,7 +148,7 @@ export async function GET(request, { params }) {
             number: job.number,
             company: job.company,
             role: t.role || '',
-            period: `${job.periodStart} – ${job.periodEnd}`,
+            period: job.periodEnd ? `${job.periodStart} – ${job.periodEnd}` : job.periodStart,
             summary: t.summary || '',
             details: t.details || '',
             stack: job.stack.map((s) => s.tech),

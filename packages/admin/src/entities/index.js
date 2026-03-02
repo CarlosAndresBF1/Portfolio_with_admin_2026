@@ -204,7 +204,7 @@ export const ExperienceJob = new EntitySchema({
     number: { type: 'text' },
     company: { type: 'text' },
     periodStart: { type: 'text' },
-    periodEnd: { type: 'text' },
+    periodEnd: { type: 'text', nullable: true },
     order: { type: 'int' },
     createdAt: { type: 'timestamp', precision: 3, createDate: true },
     updatedAt: { type: 'timestamp', precision: 3, updateDate: true },

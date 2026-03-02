@@ -164,8 +164,7 @@ export default function ExperienceFormView({ job }) {
                   label="Fin del período"
                   name="periodEnd"
                   defaultValue={job?.periodEnd || ''}
-                  placeholder="Presente"
-                  required
+                  placeholder="Presente (opcional)"
                 />
               </Stack>
               <TextField

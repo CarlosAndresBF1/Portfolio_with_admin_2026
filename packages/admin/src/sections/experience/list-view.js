@@ -69,7 +69,7 @@ export default function ExperienceListView({ jobs }) {
                   <TableCell>{esTranslation?.role || '—'}</TableCell>
                   <TableCell>
                     <Typography variant="caption">
-                      {job.periodStart} – {job.periodEnd}
+                      {job.periodStart}{job.periodEnd ? ` – ${job.periodEnd}` : ''}
                     </Typography>
                   </TableCell>
                   <TableCell>
